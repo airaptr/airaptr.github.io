@@ -279,7 +279,7 @@ const PROFILES = {
     tools: ["get_agent_template", "check_agent", "use_agent_here", "find_agents", "get_agent_code", "share_agent", "how_to_run_agent", "request_service"],
     instructions:
       "Build single-file AI agents people can use immediately: get_agent_template, write the agent, check_agent until it passes, then use_agent_here " +
-      "to run it in this chat on the user's own data. Nothing to install. Use find_agents to reuse existing ones. how_to_run_agent is only for keeping " +
+      "to run it in this chat on the user's own data. Always give the user the complete agent file after check_agent passes. Nothing to install. Use find_agents to reuse existing ones. how_to_run_agent is only for keeping " +
       "an agent on their own computer later. share_agent only when the user asks to share.",
   },
   finder: {
@@ -338,7 +338,7 @@ function getTemplate() {
     text:
       "Fill in this template from what the user described. Rules:\n- " + RULES.join("\n- ") +
       "\n\nAllowed categories: " + CATEGORIES.join(", ") +
-      "\n\nWhen done, call check_agent. Then call use_agent_here and offer to run it right now on the user's own data in this chat. Keeping it on their computer (how_to_run_agent) is optional and comes later." +
+      "\n\nWhen done, call check_agent. When it passes, give the user the complete file (a python code block with every line, plus a download if you can create files). Then call use_agent_here and offer to run it right now on the user's own data in this chat. Keeping it on their computer (how_to_run_agent) is optional and comes later." +
       "\n\n----- template_agent.py -----\n" + TEMPLATE,
     structured: { rules: RULES, categories: CATEGORIES, template: TEMPLATE },
   };
@@ -619,10 +619,13 @@ async function callTool(name, args) {
     case "get_agent_template": return getTemplate();
     case "check_agent": {
       const r = checkAgent(args.filename, args.code);
+      const f = (args.filename || "your_agent.py").replace(/[^A-Za-z0-9_.-]/g, "_");
+      const deliver = `Give the user the file now, before anything else: (1) show the complete ${f} in a single python code block, every line, with the file name above it, so they can copy it; ` +
+        `(2) if you can create files, also save it as ${f} and give them the download link. Never only mention the file name.`;
       const text = r.passed
-        ? "PASSED. The agent follows the template rules." + (r.warnings.length ? "\nSuggestions:\n- " + r.warnings.join("\n- ") : "")
+        ? "PASSED. The agent follows the template rules." + (r.warnings.length ? "\nSuggestions:\n- " + r.warnings.join("\n- ") : "") + "\n\n" + deliver
         : "NOT YET. Fix these and check again:\n- " + r.problems.join("\n- ") + (r.warnings.length ? "\nAlso:\n- " + r.warnings.join("\n- ") : "");
-      return { text, structured: r };
+      return { text, structured: r.passed ? { ...r, deliver } : r };
     }
     case "find_agents": return findAgents(args);
     case "get_agent_code": return getAgentCode(args);
