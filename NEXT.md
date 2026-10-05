@@ -5,8 +5,8 @@ Checkpoint `v1.2.0`. Three listings, one server. Everything below is ready; noth
 | Piece | State |
 |---|---|
 | MCP server | Live on Azure Functions (rg `rapp-chatgpt`): https://airaptr-api.azurewebsites.net/mcp — v1.1.1, 6 tools |
-| Site, privacy, terms | https://kody-w.github.io/airaptr/ |
-| Demo video | https://kody-w.github.io/airaptr/demo.mp4 (set as `review.demo_recording_url`) |
+| Site, privacy, terms | https://airaptr.github.io/ |
+| Demo video | https://airaptr.github.io/demo.mp4 (set as `review.demo_recording_url`) |
 | Listings | `openai-plugin/` Raptr Agent Builder (`/mcp`), `openai-plugin-finder/` Raptr Agent Finder (`/finder/mcp`), `openai-plugin-world/` DOGG World Check (`/world/mcp`) |
 | Plugin ZIPs | Attached to the latest GitHub release; rebuild with the command below |
 | Other assistants | Claude Code marketplace (`.claude-plugin/`), MCP Registry manifests (`registry/`) |
@@ -44,7 +44,7 @@ Always deploy with `AZURE_CONFIG_DIR=~/.azure-personal`; `azure/deploy.sh` does,
 
 ## Other directories (no OpenAI approval needed)
 
-- **Claude Code:** `/plugin marketplace add kody-w/airaptr`, then `/plugin install raptr-agent-builder@rapp` (or `raptr-agent-finder@rapp`, `dogg-world-check@rapp`).
+- **Claude Code:** `/plugin marketplace add airaptr/airaptr.github.io`, then `/plugin install raptr-agent-builder@rapp` (or `raptr-agent-finder@rapp`, `dogg-world-check@rapp`).
 - **Claude.ai / any MCP client:** add a custom connector with the server URL, no auth.
 - **MCP Registry:** PUBLISHED 2026-10-04, all three active as `io.github.kody-w/{raptr-agent-builder,raptr-agent-finder,dogg-world-check}`. Bump `version` and rerun `mcp-publisher publish registry/<name>.server.json` on changes (login: `mcp-publisher login github`, device code).
 - **Glama:** imports from the official registry. Once https://glama.ai/mcp/connectors/io.github.kody-w/raptr-agent-builder stops returning 404, open the PR to punkpeye/awesome-remote-mcp-servers (entry format in its CONTRIBUTING.md: name linked to the website, endpoint in backticks, Glama badge line, `🔓 - ` one-sentence description ≤120 chars; add 🤖🤖🤖 to the PR title).

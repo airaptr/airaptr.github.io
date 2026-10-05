@@ -10,7 +10,7 @@ const PAID_PREFIX = "/x402/";
 const PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"];
 const REGISTRY_URL = "https://kody-w.github.io/RAR/registry.json";
 const RAW_BASE = "https://raw.githubusercontent.com/kody-w/RAR/main/";
-const SITE = "https://kody-w.github.io/airaptr/";
+const SITE = "https://airaptr.github.io/";
 
 const CATEGORIES = [
   "core", "pipeline", "integrations", "productivity", "devtools", "b2b_sales", "b2c_sales",
@@ -642,7 +642,7 @@ function llmsTxt(origin) {
 ## Docs
 
 - [Website](${SITE}): what it does, in plain words
-- [Source](https://github.com/kody-w/airaptr): server code, listing packages, tests
+- [Source](https://github.com/airaptr/airaptr.github.io): server code, listing packages, tests
 - [Agent registry](https://kody-w.github.io/RAR/): the open agent registry (RAR)
 - [Privacy](${SITE}privacy.html) and [Terms](${SITE}terms.html)
 `;

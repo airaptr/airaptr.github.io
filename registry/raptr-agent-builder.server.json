@@ -4,10 +4,10 @@
   "description": "Turn an idea or meeting transcript into a working single-file AI agent, check it, use it right away.",
   "version": "1.0.0",
   "repository": {
-    "url": "https://github.com/kody-w/airaptr",
+    "url": "https://github.com/airaptr/airaptr.github.io",
     "source": "github"
   },
-  "websiteUrl": "https://kody-w.github.io/airaptr/",
+  "websiteUrl": "https://airaptr.github.io/",
   "remotes": [
     {
       "type": "streamable-http",

@@ -5,10 +5,10 @@
   "description": "Search about 1,700 free AI agents in the open agent registry (RAR) and use one right away in ChatGPT.",
   "author": {
     "name": "Wildhaven Homes LLC",
-    "url": "https://kody-w.github.io/airaptr/"
+    "url": "https://airaptr.github.io/"
   },
-  "homepage": "https://kody-w.github.io/airaptr/",
-  "repository": "https://github.com/kody-w/airaptr",
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
   "license": "MIT",
   "keywords": [
     "ai-agents",
@@ -32,10 +32,10 @@
           "Use an agent right away in the chat on your own data",
           "Explain how to keep an agent on your own computer"
         ],
-        "websiteURL": "https://kody-w.github.io/airaptr/",
-        "supportURL": "https://github.com/kody-w/airaptr/issues",
-        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
-        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
         "defaultPrompt": [
           "Is there an agent that summarizes sales calls?",
           "Find an agent that analyzes meeting transcripts",

@@ -2,12 +2,12 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.kody-w/dogg-world-check",
   "description": "Verified, citable world numbers right now, each with a public tick and SHA-256 fingerprint.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": {
-    "url": "https://github.com/kody-w/airaptr",
+    "url": "https://github.com/airaptr/airaptr.github.io",
     "source": "github"
   },
-  "websiteUrl": "https://kody-w.github.io/airaptr/",
+  "websiteUrl": "https://airaptr.github.io/",
   "remotes": [
     {
       "type": "streamable-http",

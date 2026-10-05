@@ -34,7 +34,7 @@ export function quote(registrarPerYear, years) {
 
 // Availability from public registration data, asked of each registry directly via IANA's RDAP
 // bootstrap file. 404 = no record = available to register.
-const UA = { "User-Agent": "raptr-domains/1.0 (+https://kody-w.github.io/airaptr/)", accept: "application/rdap+json" };
+const UA = { "User-Agent": "raptr-domains/1.0 (+https://airaptr.github.io/)", accept: "application/rdap+json" };
 let bootstrap = null;
 async function rdapBase(tld) {
   if (!bootstrap || Date.now() - bootstrap.at > 24 * 3600_000) {

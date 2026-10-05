@@ -5,10 +5,10 @@
   "description": "Name a business, product or project, and check the domains and GitHub name are free.",
   "author": {
     "name": "Wildhaven Homes LLC",
-    "url": "https://kody-w.github.io/airaptr/"
+    "url": "https://airaptr.github.io/"
   },
-  "homepage": "https://kody-w.github.io/airaptr/",
-  "repository": "https://github.com/kody-w/airaptr",
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
   "license": "MIT",
   "keywords": [
     "business-names",
@@ -32,10 +32,10 @@
           "Rank names so the ones you can fully own come first",
           "Explain how to register the domain you pick"
         ],
-        "websiteURL": "https://kody-w.github.io/airaptr/",
-        "supportURL": "https://github.com/kody-w/airaptr/issues",
-        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
-        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
         "defaultPrompt": [
           "Help me name my bakery and check the domains",
           "I'm starting a dog-walking business in Atlanta, what should I call it?",

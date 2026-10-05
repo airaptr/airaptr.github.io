@@ -4,10 +4,10 @@
   "description": "Check and price up to 20 domain names at once; agents can register them, paying per request.",
   "version": "1.0.0",
   "repository": {
-    "url": "https://github.com/kody-w/airaptr",
+    "url": "https://github.com/airaptr/airaptr.github.io",
     "source": "github"
   },
-  "websiteUrl": "https://kody-w.github.io/airaptr/",
+  "websiteUrl": "https://airaptr.github.io/",
   "remotes": [
     {
       "type": "streamable-http",

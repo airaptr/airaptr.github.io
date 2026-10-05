@@ -9,7 +9,7 @@ It sits on top of the ecosystem and never changes the Brainstem: it reads the pu
 points at the public installer.
 
 - MCP endpoint: `https://airaptr-api.azurewebsites.net/mcp` (streamable HTTP, stateless, JSON responses)
-- Site, privacy, terms: https://kody-w.github.io/airaptr/
+- Site, privacy, terms: https://airaptr.github.io/
 
 ## Tools
 

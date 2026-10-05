@@ -7,9 +7,9 @@ Submit at platform.openai.com (Apps), from a verified OpenAI platform account.
 | Name (≤30) | Raptr Agent Builder |
 | Short description (≤30) | Turn any idea into an AI agent |
 | Developer | Wildhaven Homes LLC |
-| Website | https://kody-w.github.io/airaptr/ |
-| Privacy policy | https://kody-w.github.io/airaptr/privacy.html |
-| Terms | https://kody-w.github.io/airaptr/terms.html |
+| Website | https://airaptr.github.io/ |
+| Privacy policy | https://airaptr.github.io/privacy.html |
+| Terms | https://airaptr.github.io/terms.html |
 | Icon | docs/icon-64.png (64×64, under 5 KB); docs/icon-256.png (256×256, under 10 KB) for the plugin form |
 | MCP server | https://airaptr-api.azurewebsites.net/mcp |
 | Authentication | None |
@@ -40,4 +40,4 @@ The app asks for no account and stores nothing you send it.
 
 ## Screenshots
 
-Demo video: https://kody-w.github.io/airaptr/demo.mp4 (59 s, recorded in ChatGPT developer mode, set as review.demo_recording_url).
+Demo video: https://airaptr.github.io/demo.mp4 (59 s, recorded in ChatGPT developer mode, set as review.demo_recording_url).

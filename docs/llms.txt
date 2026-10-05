@@ -20,7 +20,7 @@
 
 ## Docs
 
-- [Website](https://kody-w.github.io/airaptr/): what it does, in plain words
-- [Source](https://github.com/kody-w/airaptr): server code, listing packages, tests
+- [Website](https://airaptr.github.io/): what it does, in plain words
+- [Source](https://github.com/airaptr/airaptr.github.io): server code, listing packages, tests
 - [Agent registry](https://kody-w.github.io/RAR/): the open agent registry (RAR)
-- [Privacy](https://kody-w.github.io/airaptr/privacy.html) and [Terms](https://kody-w.github.io/airaptr/terms.html)
+- [Privacy](https://airaptr.github.io/privacy.html) and [Terms](https://airaptr.github.io/terms.html)

@@ -3,7 +3,7 @@
   "description": "Raptr apps for AI assistants: build agents, find agents, name a business, check domains, and get verified world numbers.",
   "owner": {
     "name": "Wildhaven Homes LLC",
-    "url": "https://kody-w.github.io/airaptr/"
+    "url": "https://airaptr.github.io/"
   },
   "plugins": [
     {

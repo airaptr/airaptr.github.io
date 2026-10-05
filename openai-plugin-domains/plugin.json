@@ -5,10 +5,10 @@
   "description": "Find, check and price domain names, and register them.",
   "author": {
     "name": "Wildhaven Homes LLC",
-    "url": "https://kody-w.github.io/airaptr/"
+    "url": "https://airaptr.github.io/"
   },
-  "homepage": "https://kody-w.github.io/airaptr/",
-  "repository": "https://github.com/kody-w/airaptr",
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
   "license": "MIT",
   "keywords": [
     "domains",
@@ -32,10 +32,10 @@
           "Explain how to register a domain",
           "Let AI agents register domains, paying per request"
         ],
-        "websiteURL": "https://kody-w.github.io/airaptr/",
-        "supportURL": "https://github.com/kody-w/airaptr/issues",
-        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
-        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
         "defaultPrompt": [
           "Is getrapp.ai available, and what does it cost?",
           "Suggest 10 names for my bakery and check which domains are free",
