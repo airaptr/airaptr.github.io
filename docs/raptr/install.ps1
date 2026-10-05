@@ -1,6 +1,7 @@
 # Raptr installer for Windows: irm https://airaptr.github.io/raptr/install.ps1 | iex
 $ErrorActionPreference = "Stop"
-$py = (Get-Command python -ErrorAction SilentlyContinue) ?? (Get-Command py -ErrorAction SilentlyContinue)
+$py = Get-Command python -ErrorAction SilentlyContinue
+if (-not $py) { $py = Get-Command py -ErrorAction SilentlyContinue }
 if (-not $py) { Write-Host "Raptr needs Python 3.8 or newer: https://www.python.org/downloads/ (tick 'Add to PATH'), then run this again."; return }
 $dir = Join-Path $env:LOCALAPPDATA "raptr"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
