@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "raptr-names": {
+      "type": "http",
+      "url": "https://airaptr-api.azurewebsites.net/names/mcp"
+    }
+  }
+}

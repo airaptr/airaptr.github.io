@@ -1,0 +1,26 @@
+# Raptr
+
+> AI agents anyone can use. Three free, read-only MCP servers: build a single-file AI agent from an idea and run it on the user's data, find one of about 1,700 ready-made agents, or get verified world numbers with a public SHA-256 fingerprint. No account, no API key, nothing stored.
+
+## MCP servers (streamable HTTP, no auth)
+
+- [Raptr Agent Builder](https://airaptr-api.azurewebsites.net/mcp): get_agent_template, check_agent, use_agent_here, find_agents, get_agent_code, share_agent, how_to_run_agent
+- [Raptr Agent Finder](https://airaptr-api.azurewebsites.net/finder/mcp): find_agents, get_agent_code, use_agent_here, how_to_run_agent
+- [DOGG World Check](https://airaptr-api.azurewebsites.net/world/mcp): world_now, fingerprint_text
+- [Raptr Domains](https://airaptr-api.azurewebsites.net/domains/mcp): check_domain, register_domain
+
+## Pay per call (x402 v2, USDC)
+
+- GET https://airaptr-api.azurewebsites.net/x402/world: fresh verified world snapshot, $0.001
+- POST https://airaptr-api.azurewebsites.net/x402/domains/register?domain=NAME: register an available domain; the 402 response quotes the price; charged only if registration succeeds (raise your x402 client's default $1 per-payment cap first)
+
+## A2A
+
+- [Agent card](https://airaptr-api.azurewebsites.net/.well-known/agent-card.json): JSON-RPC message/send at https://airaptr-api.azurewebsites.net/a2a. Skills: find_agents, world_now, agent_template.
+
+## Docs
+
+- [Website](https://kody-w.github.io/airaptr/): what it does, in plain words
+- [Source](https://github.com/kody-w/airaptr): server code, listing packages, tests
+- [Agent registry](https://kody-w.github.io/RAR/): the open agent registry (RAR)
+- [Privacy](https://kody-w.github.io/airaptr/privacy.html) and [Terms](https://kody-w.github.io/airaptr/terms.html)

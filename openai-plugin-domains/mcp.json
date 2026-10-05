@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "raptr-domains": {
+      "type": "streamable-http",
+      "url": "https://airaptr-api.azurewebsites.net/domains/mcp"
+    }
+  }
+}

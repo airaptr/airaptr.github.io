@@ -1,0 +1,35 @@
+{
+  "name": "airaptr",
+  "description": "Raptr apps for AI assistants: build agents, find agents, name a business, check domains, and get verified world numbers.",
+  "owner": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "plugins": [
+    {
+      "name": "raptr-agent-builder",
+      "source": "./claude-plugins/raptr-agent-builder",
+      "description": "Turn any idea or meeting transcript into a working single-file AI agent, check it, and use it right away."
+    },
+    {
+      "name": "raptr-agent-finder",
+      "source": "./claude-plugins/raptr-agent-finder",
+      "description": "Find a free, ready-made AI agent for a task in the open agent registry (RAR) (about 1,700 agents)."
+    },
+    {
+      "name": "dogg-world-check",
+      "source": "./claude-plugins/dogg-world-check",
+      "description": "Verified, citable numbers about the world right now, each with a public tick and SHA-256 fingerprint."
+    },
+    {
+      "name": "raptr-domains",
+      "source": "./claude-plugins/raptr-domains",
+      "description": "Check and price domain names, and learn how to register them."
+    },
+    {
+      "name": "raptr-names",
+      "source": "./claude-plugins/raptr-names",
+      "description": "Name a business or project and check free domains and GitHub names."
+    }
+  ]
+}

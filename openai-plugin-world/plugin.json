@@ -1,0 +1,106 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dogg-world-check",
+  "version": "1.0.0",
+  "description": "Verified, citable numbers about the world right now, each with a public tick and SHA-256 fingerprint.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "repository": "https://github.com/kody-w/airaptr",
+  "license": "MIT",
+  "keywords": [
+    "world-data",
+    "verification",
+    "bitcoin",
+    "exchange-rates",
+    "dogg"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "DOGG World Check",
+        "shortDescription": "Verified world numbers, now",
+        "longDescription": "Ask what's happening in the world right now and get numbers you can trust and cite: Bitcoin price and block height, the crypto market, major currency exchange rates, earthquakes in the past hour, space weather and where the International Space Station is.\n\nEvery answer comes from one public snapshot of the DOGG world tick, with its tick number, time and SHA-256 fingerprint, so anyone can check later exactly what the numbers were and where they came from.\n\nIt can also fingerprint a piece of text, so you can tell whether two documents are exactly identical.\n\nAll tools are read-only. No account needed, and nothing you send is stored. Numbers are for information only, not financial, safety or emergency advice.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Give a verified snapshot of world numbers right now",
+          "Bitcoin, crypto market and currency exchange rates",
+          "Earthquakes in the past hour and space weather",
+          "Quote the public tick, time and fingerprint behind every number",
+          "Fingerprint text to check whether two documents are identical"
+        ],
+        "websiteURL": "https://kody-w.github.io/airaptr/",
+        "supportURL": "https://github.com/kody-w/airaptr/issues",
+        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
+        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "defaultPrompt": [
+          "What's the world doing right now, with sources?",
+          "What's the Bitcoin price, verifiably?",
+          "Are these two paragraphs exactly the same?"
+        ],
+        "brandColor": "#7A3E9D",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "World snapshot with proof",
+              "prompt": "What's happening in the world right now? Give me numbers I can cite.",
+              "tools_triggered": "world_now",
+              "expected_behavior": "Bitcoin price, crypto market, exchange rates, earthquakes, space weather and ISS position, followed by the tick number, time and fingerprint."
+            },
+            {
+              "description": "Single verified number",
+              "prompt": "What's the Bitcoin price right now, verifiably?",
+              "tools_triggered": "world_now",
+              "expected_behavior": "The Bitcoin spot price from the snapshot, with its tick number, time and fingerprint."
+            },
+            {
+              "description": "Exchange rates",
+              "prompt": "How many euros and yen is one US dollar right now?",
+              "tools_triggered": "world_now",
+              "expected_behavior": "EUR and JPY rates from the snapshot, with its tick number, time and fingerprint."
+            },
+            {
+              "description": "Fingerprint a text",
+              "prompt": "Give me a fingerprint of this sentence: The contract is signed.",
+              "tools_triggered": "fingerprint_text",
+              "expected_behavior": "Returns the 64-character SHA-256 fingerprint of the exact sentence."
+            },
+            {
+              "description": "Compare against a fingerprint",
+              "prompt": "Does the text 'hello' match the fingerprint 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824?",
+              "tools_triggered": "fingerprint_text",
+              "expected_behavior": "Says it matches: the text is exactly the same."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Trading is out of scope",
+              "prompt": "Buy me 0.1 Bitcoin."
+            },
+            {
+              "description": "Forecasting is out of scope",
+              "prompt": "Will Bitcoin go up tomorrow?"
+            },
+            {
+              "description": "Emergency help is out of scope",
+              "prompt": "There's an earthquake right now, what should I do?"
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release. Verified, citable numbers about the world right now, each with a public tick and SHA-256 fingerprint."
+      }
+    }
+  }
+}

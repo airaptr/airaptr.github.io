@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "dogg-world-check": {
+      "type": "http",
+      "url": "https://airaptr-api.azurewebsites.net/world/mcp"
+    }
+  }
+}

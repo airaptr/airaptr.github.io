@@ -1,0 +1,107 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "raptr-agent-builder",
+  "version": "1.2.0",
+  "description": "Turns an idea or a meeting transcript into a working AI agent you can use right away in ChatGPT, with nothing to install.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "repository": "https://github.com/kody-w/airaptr",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "agent-builder",
+    "automation",
+    "python",
+    "rapp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Raptr Agent Builder",
+        "shortDescription": "Turn any idea into an AI agent",
+        "longDescription": "Describe a task, or paste a meeting transcript, and Raptr Agent Builder turns it into a working AI agent you can use right away, right here in the chat. Nothing to install and no account needed.\n\nBefore building, it searches the open agent registry (RAR), about 1,700 free agents, in case one already does the job. When it builds a new one, it uses the official template and checks the finished agent against the template's rules, fixing problems until it passes. Then ChatGPT runs the agent on your own data, such as a pasted list, a spreadsheet or meeting notes, and shows you the result.\n\nThe agent is a single file you keep. If you want it working on your own computer later, the app explains how to run it with the free Brainstem on Mac, Windows, or Linux.\n\nGood for turning a recurring process into an agent, prototyping an assistant for your team from a meeting, or finding an existing agent before you write one.\n\nAll tools are read-only. The app never runs code on its own servers, installs anything, or connects to your accounts, and it stores nothing you send it.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Build a working AI agent from an idea or a meeting transcript",
+          "Use the agent right away in the chat on your own data, nothing to install",
+          "Check an agent against the template's rules until it passes",
+          "Search about 1,700 free agents in the open agent registry (RAR) and read their code",
+          "Explain how to keep an agent running on your own computer"
+        ],
+        "websiteURL": "https://kody-w.github.io/airaptr/",
+        "supportURL": "https://github.com/kody-w/airaptr/issues",
+        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
+        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "defaultPrompt": [
+          "Build me an agent that sorts invoices into pay now, review, or hold",
+          "Is there already an agent that analyzes meeting transcripts?",
+          "Turn this meeting transcript into an agent I can use"
+        ],
+        "brandColor": "#1F6F4A",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Build a new agent from a plain-language idea",
+              "prompt": "Build me an agent that sorts invoices into pay now, review, or hold based on amount and due date.",
+              "tools_triggered": "get_agent_template, check_agent, use_agent_here",
+              "expected_behavior": "Fetches the template, writes invoice_triage_agent.py, calls check_agent until it returns PASSED, then calls use_agent_here and offers to run the agent on the user's invoices in the chat."
+            },
+            {
+              "description": "Use a freshly built agent on the user's data",
+              "prompt": "Build me an agent that sorts invoices into pay now, review, or hold, then run it on these: INV-1 $420 due tomorrow; INV-2 $8,200 due in 3 days; INV-3 $150 due in 40 days.",
+              "tools_triggered": "get_agent_template, check_agent, use_agent_here",
+              "expected_behavior": "Builds and checks the agent, then runs it in the chat and returns a pay now / review / hold result for each of the three invoices."
+            },
+            {
+              "description": "Find an existing agent before building",
+              "prompt": "Is there already an agent that analyzes meeting transcripts?",
+              "tools_triggered": "find_agents",
+              "expected_behavior": "Lists registry matches, including Meeting Analyzer (@cat-agent-skills/meeting_analyzer), with one-line descriptions."
+            },
+            {
+              "description": "Read a registry agent's code",
+              "prompt": "Show me the code for @cat-agent-skills/meeting_analyzer.",
+              "tools_triggered": "get_agent_code",
+              "expected_behavior": "Returns the full Python source of the Meeting Analyzer agent."
+            },
+            {
+              "description": "Explain how to keep an agent on the user's computer",
+              "prompt": "How do I run a agent on Windows?",
+              "tools_triggered": "how_to_run_agent",
+              "expected_behavior": "Four steps: the PowerShell install command for the free Brainstem, GitHub sign-in, the agents folder path, and opening http://localhost:7071."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Making payments is out of scope",
+              "prompt": "Pay all my overdue invoices from my bank account."
+            },
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Seattle today?"
+            },
+            {
+              "description": "Deploying to the user's systems is out of scope",
+              "prompt": "Deploy this agent to my company's production servers."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments.",
+        "demo_recording_url": "https://kody-w.github.io/airaptr/demo.mp4"
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: build single-file AI agents from an idea or transcript, check them against the template, search the open agent registry (RAR), and get run steps for the free Brainstem. Read-only; no account needed."
+      }
+    }
+  }
+}

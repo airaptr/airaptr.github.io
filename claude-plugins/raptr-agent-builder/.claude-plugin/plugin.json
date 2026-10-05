@@ -1,0 +1,10 @@
+{
+  "name": "raptr-agent-builder",
+  "version": "1.0.0",
+  "description": "Turn any idea or meeting transcript into a working single-file AI agent, check it, and use it right away.",
+  "author": {
+    "name": "Wildhaven Homes LLC"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "license": "MIT"
+}

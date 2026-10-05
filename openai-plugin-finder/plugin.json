@@ -1,0 +1,106 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "raptr-agent-finder",
+  "version": "1.0.0",
+  "description": "Search about 1,700 free AI agents in the open agent registry (RAR) and use one right away in ChatGPT.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "repository": "https://github.com/kody-w/airaptr",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "agent-registry",
+    "automation",
+    "search",
+    "rapp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Raptr Agent Finder",
+        "shortDescription": "Find a free AI agent for it",
+        "longDescription": "Ask whether there's already an AI agent for a task, and Raptr Agent Finder searches the open agent registry (RAR), about 1,700 free single-file agents for sales, operations, finance, support, meetings and more.\n\nIt shows the best matches in plain words, lets you read any agent's code, and then ChatGPT can use the agent right away on your own data in the same chat. Nothing to install and no account needed. If you want to keep an agent on your own computer later, it explains how.\n\nAll tools are read-only. The app never runs code on its own servers or connects to your accounts, and it stores nothing you send it.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Search about 1,700 free agents in the open agent registry (RAR)",
+          "Show the best matches in plain words",
+          "Read the full code of any agent",
+          "Use an agent right away in the chat on your own data",
+          "Explain how to keep an agent on your own computer"
+        ],
+        "websiteURL": "https://kody-w.github.io/airaptr/",
+        "supportURL": "https://github.com/kody-w/airaptr/issues",
+        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
+        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "defaultPrompt": [
+          "Is there an agent that summarizes sales calls?",
+          "Find an agent that analyzes meeting transcripts",
+          "What agents are there for invoices?"
+        ],
+        "brandColor": "#1F4F8F",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Find agents for a task",
+              "prompt": "Is there an agent that analyzes meeting transcripts?",
+              "tools_triggered": "find_agents",
+              "expected_behavior": "Lists registry matches including Meeting Analyzer (@cat-agent-skills/meeting_analyzer) with one-line descriptions."
+            },
+            {
+              "description": "Find agents by business area",
+              "prompt": "What agents are there for invoices?",
+              "tools_triggered": "find_agents",
+              "expected_behavior": "Lists invoice-related agents from the registry, such as supplier and freight invoice audit agents."
+            },
+            {
+              "description": "Read an agent's code",
+              "prompt": "Show me the code for @cat-agent-skills/meeting_analyzer.",
+              "tools_triggered": "get_agent_code",
+              "expected_behavior": "Returns the full Python source of the Meeting Analyzer agent."
+            },
+            {
+              "description": "Use a found agent in the chat",
+              "prompt": "Find a meeting analysis agent and run it on this: 'Ana: we ship Friday. Ben: QA is not done. Ana: then Monday.'",
+              "tools_triggered": "find_agents, get_agent_code, use_agent_here",
+              "expected_behavior": "Finds Meeting Analyzer, reads its code, and applies it to the pasted notes in the chat, saying whether it ran the file or applied its rules."
+            },
+            {
+              "description": "Keep an agent on the user's computer",
+              "prompt": "How do I keep a registry agent running on my Mac?",
+              "tools_triggered": "how_to_run_agent",
+              "expected_behavior": "Four steps: the install command for the free Brainstem, GitHub sign-in, the agents folder path, and http://localhost:7071."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Building a brand-new agent is a different app",
+              "prompt": "Write me a new Python agent from scratch for payroll."
+            },
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Seattle today?"
+            },
+            {
+              "description": "Installing software on the user's machine is out of scope",
+              "prompt": "Install this agent on my laptop for me."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release. Search about 1,700 free AI agents in the open agent registry (RAR) and use one right away in ChatGPT."
+      }
+    }
+  }
+}

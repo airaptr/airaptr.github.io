@@ -1,0 +1,106 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "raptr-domains",
+  "version": "1.0.0",
+  "description": "Find, check and price domain names, and register them.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "repository": "https://github.com/kody-w/airaptr",
+  "license": "MIT",
+  "keywords": [
+    "domains",
+    "domain-names",
+    "naming",
+    "websites",
+    "rapp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Raptr Domains",
+        "shortDescription": "Find and check domain names",
+        "longDescription": "Naming a business, a project or a side hustle? Raptr Domains checks whether domain names are free and what they cost, up to 20 at a time, so ChatGPT can brainstorm names with you and tell you straight away which ones you can actually get.\n\nIt asks each registry directly, so availability is current, and prices include the first term (some endings, like .ai, require two years). When you find the one you want, it explains how to register it: we can register it for you, and AI agents can buy it directly, paying per request.\n\nChecking is free and needs no account. Nothing you search for is stored.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Check whether up to 20 domain names are available at once",
+          "Price each one, including the first term",
+          "Brainstorm names with ChatGPT and keep only the ones you can get",
+          "Explain how to register a domain",
+          "Let AI agents register domains, paying per request"
+        ],
+        "websiteURL": "https://kody-w.github.io/airaptr/",
+        "supportURL": "https://github.com/kody-w/airaptr/issues",
+        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
+        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "defaultPrompt": [
+          "Is getrapp.ai available, and what does it cost?",
+          "Suggest 10 names for my bakery and check which domains are free",
+          "Which of these are free: shopnorth.com, shopnorth.co, shopnorth.io"
+        ],
+        "brandColor": "#B4531F",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Check one domain",
+              "prompt": "Is getrapp.ai available, and what does it cost?",
+              "tools_triggered": "check_domain",
+              "expected_behavior": "Says getrapp.ai is available (if still unregistered) with the 2-year price, or that it is taken."
+            },
+            {
+              "description": "Check several domains",
+              "prompt": "Which of these are free: google.com, rappagents.com, tryrapp.com",
+              "tools_triggered": "check_domain",
+              "expected_behavior": "google.com taken; the others available with prices, unless registered since."
+            },
+            {
+              "description": "Brainstorm and check",
+              "prompt": "Suggest 8 names for a dog-walking business in Atlanta and check which .com domains are free.",
+              "tools_triggered": "check_domain",
+              "expected_behavior": "Suggests names, checks them in one call, and lists which are available with prices."
+            },
+            {
+              "description": "How to buy",
+              "prompt": "I want to buy tryrapp.com. How do I do that?",
+              "tools_triggered": "register_domain",
+              "expected_behavior": "Explains that people can ask to have it registered via the contact page and agents can pay per request; nothing is bought."
+            },
+            {
+              "description": "Invalid name",
+              "prompt": "Is 'my shop' available as a domain?",
+              "tools_triggered": "check_domain",
+              "expected_behavior": "Asks for a full domain name such as myshop.com, or checks suggested full names."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Hosting a website is out of scope",
+              "prompt": "Build and host my website for me."
+            },
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Seattle today?"
+            },
+            {
+              "description": "Transferring someone else's domain is out of scope",
+              "prompt": "Take over the domain google.com for me."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: check and price up to 20 domain names at once, and learn how to register them."
+      }
+    }
+  }
+}

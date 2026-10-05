@@ -1,0 +1,106 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "raptr-names",
+  "version": "1.0.0",
+  "description": "Name a business, product or project, and check the domains and GitHub name are free.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://kody-w.github.io/airaptr/"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "repository": "https://github.com/kody-w/airaptr",
+  "license": "MIT",
+  "keywords": [
+    "business-names",
+    "naming",
+    "branding",
+    "domains",
+    "startup"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Raptr Names",
+        "shortDescription": "Name it, then own the name",
+        "longDescription": "Starting a business, a side hustle, an app or a podcast? Raptr Names brainstorms names with you and checks, for each one, which domains are actually free (.com, .co, .ai, .io and .app by default, or any endings you choose) and whether the GitHub name is free.\n\nIt checks up to 8 names at a time, ranks them (a free .com counts most), shows the price of each free domain including the first term, and keeps suggesting new options until you have a name you can really own.\n\nChecking is free and needs no account. Nothing you search for is stored.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Brainstorm business, product and project names",
+          "Check which domains are free for each name, with prices",
+          "Check whether the GitHub name is free",
+          "Rank names so the ones you can fully own come first",
+          "Explain how to register the domain you pick"
+        ],
+        "websiteURL": "https://kody-w.github.io/airaptr/",
+        "supportURL": "https://github.com/kody-w/airaptr/issues",
+        "privacyPolicyURL": "https://kody-w.github.io/airaptr/privacy.html",
+        "termsOfServiceURL": "https://kody-w.github.io/airaptr/terms.html",
+        "defaultPrompt": [
+          "Help me name my bakery and check the domains",
+          "I'm starting a dog-walking business in Atlanta, what should I call it?",
+          "Find a name for my AI startup with a free .com"
+        ],
+        "brandColor": "#2C6E8F",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Name a small business",
+              "prompt": "Help me name my bakery and check which domains are free.",
+              "tools_triggered": "check_names",
+              "expected_behavior": "Suggests several names, checks them in one call, and lists free domains with prices and GitHub status, best first."
+            },
+            {
+              "description": "Check specific names",
+              "prompt": "Check these names: Rise and Crumb, Northwind Bakery.",
+              "tools_triggered": "check_names",
+              "expected_behavior": "Ranks the two names with their free domains (with prices) and GitHub name status."
+            },
+            {
+              "description": "Custom endings",
+              "prompt": "I want a .shop domain for my candle store. Suggest names and check them.",
+              "tools_triggered": "check_names",
+              "expected_behavior": "Checks the suggested names with the .shop ending (and others if asked) and reports which are free."
+            },
+            {
+              "description": "Iterate when taken",
+              "prompt": "Is 'google' available as a business name with a .com?",
+              "tools_triggered": "check_names",
+              "expected_behavior": "Reports google.com as taken and suggests and checks alternatives."
+            },
+            {
+              "description": "How to buy",
+              "prompt": "I picked northwindbakery.com. How do I get it?",
+              "tools_triggered": "register_domain",
+              "expected_behavior": "Explains how to register it; nothing is bought."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Trademark legal advice is out of scope",
+              "prompt": "Can you register a trademark for my business name?"
+            },
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Seattle today?"
+            },
+            {
+              "description": "Logo design is out of scope",
+              "prompt": "Design a logo for my bakery."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: brainstorm names and check free domains and GitHub names, ranked."
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.kody-w/raptr-domains",
+  "description": "Check and price up to 20 domain names at once; agents can register them, paying per request.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/kody-w/airaptr",
+    "source": "github"
+  },
+  "websiteUrl": "https://kody-w.github.io/airaptr/",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://airaptr-api.azurewebsites.net/domains/mcp"
+    }
+  ]
+}

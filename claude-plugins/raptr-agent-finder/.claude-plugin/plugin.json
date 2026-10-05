@@ -1,0 +1,10 @@
+{
+  "name": "raptr-agent-finder",
+  "version": "1.0.0",
+  "description": "Find a free, ready-made AI agent for a task in the open agent registry (RAR) (about 1,700 agents).",
+  "author": {
+    "name": "Wildhaven Homes LLC"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "license": "MIT"
+}

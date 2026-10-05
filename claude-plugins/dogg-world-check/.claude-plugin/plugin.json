@@ -1,0 +1,10 @@
+{
+  "name": "dogg-world-check",
+  "version": "1.0.0",
+  "description": "Verified, citable numbers about the world right now, each with a public tick and SHA-256 fingerprint.",
+  "author": {
+    "name": "Wildhaven Homes LLC"
+  },
+  "homepage": "https://kody-w.github.io/airaptr/",
+  "license": "MIT"
+}
