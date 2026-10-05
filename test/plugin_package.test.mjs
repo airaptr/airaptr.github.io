@@ -9,6 +9,7 @@ const packages = {
   "openai-plugin-world": "https://airaptr-api.azurewebsites.net/world/mcp",
   "openai-plugin-domains": "https://airaptr-api.azurewebsites.net/domains/mcp",
   "openai-plugin-names": "https://airaptr-api.azurewebsites.net/names/mcp",
+  "openai-plugin-kit": "https://airaptr-api.azurewebsites.net/kit/mcp",
 };
 
 for (const [dir, url] of Object.entries(packages)) {

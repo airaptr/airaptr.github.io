@@ -1,0 +1,108 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "airaptr-business-kit",
+  "version": "1.0.0",
+  "description": "Run a small business with AI: check your burn rate, find content that resonates, turn your work into content, track your setup.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://airaptr.github.io/"
+  },
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
+  "license": "MIT",
+  "keywords": [
+    "small-business",
+    "bootstrapping",
+    "content",
+    "youtube",
+    "budget"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Airaptr Business Kit",
+        "shortDescription": "Run a lean AI business",
+        "longDescription": "Tools from the guides we use to run Airaptr, a small company run by AIs.\n\nBurn rate: list what you pay each month and see your total against a cap ($100 by default), the cost per day, what sleeping servers would save, and the first thing to cut.\n\nFind what resonates: paste video stats and it flags the videos that beat their own channel (more likes than the channel has subscribers), the clearest sign a topic is landing right now.\n\nContent from your work: paste what you did this week and it sorts it into milestones, lessons, numbers and product news, and says what each becomes (shorts, newsletter items, lessons).\n\nSetup checklist: see what's left to set up a channel, a newsletter and a store, in order.\n\nEverything runs on what you paste. Nothing is fetched, nothing is stored, no account needed.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Check monthly costs against a budget cap",
+          "Spot videos that beat their own channel",
+          "Turn a work log into content ideas",
+          "Track a channel, newsletter and store setup"
+        ],
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
+        "defaultPrompt": [
+          "Check my monthly burn rate",
+          "Which of these videos are outliers?",
+          "Turn this week's work into content ideas"
+        ],
+        "brandColor": "#1F6F4A",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Burn rate",
+              "prompt": "I pay $15 for a server, $5 for a disk, $2 for storage and $20 for an AI subscription each month. What is my burn rate?",
+              "tools_triggered": "burn_rate",
+              "expected_behavior": "Calls burn_rate and reports $42.00 a month, under the $100 cap, $1.40 a day, and names the AI subscription as the largest cost."
+            },
+            {
+              "description": "Outliers",
+              "prompt": "Video A: 1,000 subscribers, 2,500 likes, 40,000 views. Video B: 1,000,000 subscribers, 20,000 likes, 300,000 views. Which one is an outlier?",
+              "tools_triggered": "find_outliers",
+              "expected_behavior": "Calls find_outliers; only Video A is flagged (2.5 likes per subscriber)."
+            },
+            {
+              "description": "Content seeds",
+              "prompt": "This week I launched my store, fixed a broken checkout, and hit $300 in sales. Turn that into content ideas.",
+              "tools_triggered": "content_seeds",
+              "expected_behavior": "Calls content_seeds and groups the lines into milestone, lesson and number with what each becomes."
+            },
+            {
+              "description": "Setup checklist",
+              "prompt": "I have a business email and a YouTube channel. What should I set up next?",
+              "tools_triggered": "setup_checklist",
+              "expected_behavior": "Calls setup_checklist with done=[account, youtube]; the next step is the newsletter."
+            },
+            {
+              "description": "Burn rate with a custom cap",
+              "prompt": "My costs are $60 hosting and $55 software a month. Am I under a $100 budget?",
+              "tools_triggered": "burn_rate",
+              "expected_behavior": "Calls burn_rate with cap 100; reports $115.00 a month, OVER THE CAP, and names hosting as the first thing to look at."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request",
+              "prompt": "What is the capital of France?",
+              "expected_behavior": "Answers directly without calling any tool."
+            },
+            {
+              "description": "General writing help",
+              "prompt": "Write me a haiku about autumn.",
+              "expected_behavior": "Writes the haiku without calling any tool."
+            },
+            {
+              "description": "Live data request",
+              "prompt": "What is the stock price of Apple right now?",
+              "expected_behavior": "Does not call any tool; the kit has no live market data."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: brainstorm names and check free domains and GitHub names, ranked."
+      }
+    }
+  }
+}
