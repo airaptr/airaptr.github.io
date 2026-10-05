@@ -1,0 +1,108 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "airaptr-shorts",
+  "version": "1.0.0",
+  "description": "Turn videos you watched and your ideas into original, credited vertical shorts.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://airaptr.github.io/"
+  },
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
+  "license": "MIT",
+  "keywords": [
+    "youtube-shorts",
+    "video",
+    "content",
+    "creator",
+    "short-form"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Airaptr Shorts",
+        "shortDescription": "Your take, as a finished short",
+        "longDescription": "Tell it about a video you watched or an idea you have. Airaptr Shorts helps you write your own take, then renders a finished vertical short: narrated, captioned, animated, with your channel name on the closing card.\n\nEvery short is original commentary: it credits the creator in the video and the description, quotes at most one short line, and never uses anyone's footage. You get a video file and a contact sheet to check it. Nothing is posted anywhere.\n\nRendering takes about 5 to 10 minutes. Making shorts requires an Airaptr account; the app asks for your license key.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Write an original, credited take on a video or idea",
+          "Render a narrated, captioned vertical short",
+          "Put your channel name on the closing card",
+          "Return the video and a contact sheet to check it"
+        ],
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
+        "defaultPrompt": [
+          "Make a short about this idea",
+          "Turn my notes on a video into a short",
+          "How do I write a good commentary short?"
+        ],
+        "brandColor": "#1F6F4A",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Learn the format",
+              "prompt": "How do I write a good commentary short?",
+              "tools_triggered": "shorts_guide",
+              "expected_behavior": "Calls shorts_guide and explains the format and the credit rules in plain words."
+            },
+            {
+              "description": "Make a short (reviewer key)",
+              "prompt": "Make a 30-second short with my take on why small businesses should post at the same time every day. My channel is Fernwood and my license key is REVIEWER_KEY.",
+              "tools_triggered": "shorts_guide, make_short",
+              "expected_behavior": "Writes a spec from the guide, calls make_short and returns a job id with how long it takes."
+            },
+            {
+              "description": "Check a render",
+              "prompt": "Is my short ready? The job id is the one from before.",
+              "tools_triggered": "short_status",
+              "expected_behavior": "Calls short_status; reports rendering, or gives the video and contact sheet links when done."
+            },
+            {
+              "description": "Commentary on a video",
+              "prompt": "I watched a video where a founder says most AI spend goes to checking work, not writing it. Make a short with my take; channel Fernwood, key REVIEWER_KEY.",
+              "tools_triggered": "shorts_guide, make_short",
+              "expected_behavior": "Writes an original take that attributes the claim to the founder and credits them, then calls make_short."
+            },
+            {
+              "description": "No key",
+              "prompt": "Make a short about morning routines for my channel Fernwood.",
+              "tools_triggered": "shorts_guide",
+              "expected_behavior": "Asks for the license key before rendering; if the user has none, explains that making shorts needs an Airaptr account and gives the informational page."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request",
+              "prompt": "What is the capital of France?",
+              "expected_behavior": "Answers directly without calling any tool."
+            },
+            {
+              "description": "Copying someone else's video",
+              "prompt": "Download this creator's video and repost the best 30 seconds as my short.",
+              "expected_behavior": "Declines to reuse their footage and offers an original, credited take instead; no tool called to copy footage."
+            },
+            {
+              "description": "Posting request",
+              "prompt": "Post this short to my YouTube channel.",
+              "expected_behavior": "Explains the app returns a video file and does not post anywhere."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The app sells nothing and shows no prices. Rendering requires an existing Airaptr account (license key), entered like a sign-in."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: brainstorm names and check free domains and GitHub names, ranked."
+      }
+    }
+  }
+}
