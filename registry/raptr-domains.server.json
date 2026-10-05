@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.kody-w/raptr-domains",
+  "name": "io.github.airaptr/raptr-domains",
   "description": "Check and price up to 20 domain names at once; agents can register them, paying per request.",
   "version": "1.0.0",
   "repository": {

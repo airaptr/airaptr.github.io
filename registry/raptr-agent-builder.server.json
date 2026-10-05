@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.kody-w/raptr-agent-builder",
+  "name": "io.github.airaptr/raptr-agent-builder",
   "description": "Turn an idea or meeting transcript into a working single-file AI agent, check it, use it right away.",
   "version": "1.0.0",
   "repository": {
