@@ -3,7 +3,7 @@
   "mcpServers": {
     "airaptr-shorts": {
       "type": "streamable-http",
-      "url": "https://shorts-api.wonderfulcoast-92452b49.eastus2.azurecontainerapps.io/mcp"
+      "url": "https://shorts-api.kindmoss-0cfa057a.eastus2.azurecontainerapps.io/mcp"
     }
   }
 }
