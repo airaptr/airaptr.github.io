@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "family-story-book": {
+      "type": "streamable-http",
+      "url": "https://storybook-api.kindmoss-0cfa057a.eastus2.azurecontainerapps.io/mcp"
+    }
+  }
+}

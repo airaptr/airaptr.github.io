@@ -1,0 +1,108 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "family-story-book",
+  "version": "1.0.0",
+  "description": "Turn a parent's or grandparent's memories into a real family book.",
+  "author": {
+    "name": "Wildhaven Homes LLC",
+    "url": "https://airaptr.github.io/"
+  },
+  "homepage": "https://airaptr.github.io/",
+  "repository": "https://github.com/airaptr/airaptr.github.io",
+  "license": "MIT",
+  "keywords": [
+    "family",
+    "memoir",
+    "genealogy",
+    "life-stories",
+    "gift"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Family Story Book",
+        "shortDescription": "Their stories, as a real book",
+        "longDescription": "Interview a parent or grandparent right in the chat and turn their life stories into a book the whole family can keep.\n\nFamily Story Book asks one gentle question at a time (childhood, love, work, hard times, what they want you to know), saves each memory in their own words, and lets relatives add their own stories with a shared family key. Chapters are written only from what was actually said, never invented. When you're ready, it lays everything out as a print-ready 6x9 book with photo pages and pages for more memories.\n\nBooks are private: only people with a key can see or add to them, and you can delete a book and everything in it at any time.",
+        "developerName": "Wildhaven Homes LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Interview a family member one question at a time",
+          "Let relatives add memories with a shared family key",
+          "Write chapters only from saved memories",
+          "Make a print-ready 6x9 book PDF"
+        ],
+        "websiteURL": "https://airaptr.github.io/",
+        "supportURL": "https://github.com/airaptr/airaptr.github.io/issues",
+        "privacyPolicyURL": "https://airaptr.github.io/privacy.html",
+        "termsOfServiceURL": "https://airaptr.github.io/terms.html",
+        "defaultPrompt": [
+          "Help me interview my grandmother for a book about her life",
+          "Start a story book about my dad for his 70th birthday",
+          "Add my memory of Grandpa's workshop to our family book"
+        ],
+        "brandColor": "#7A4E2D",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Start a book",
+              "prompt": "Help me make a book of my grandmother Rose's life stories.",
+              "tools_triggered": "story_book_guide, start_book, next_question",
+              "expected_behavior": "Starts a book, shows the book key and family key with the warning to keep the book key private, and asks the first interview question."
+            },
+            {
+              "description": "Save a memory",
+              "prompt": "She says she was born in a farmhouse outside Ames in 1941 during a big snowstorm.",
+              "tools_triggered": "save_memory, next_question",
+              "expected_behavior": "Saves the memory in her words to Beginnings and asks a natural follow-up."
+            },
+            {
+              "description": "Family adds a memory",
+              "prompt": "Using family key fm_REVIEWER, add my memory: Grandma always let us lick the frosting bowl.",
+              "tools_triggered": "save_memory",
+              "expected_behavior": "Saves the memory, told by the user, without needing the book key."
+            },
+            {
+              "description": "Write a chapter",
+              "prompt": "Write the Beginnings chapter from what we saved.",
+              "tools_triggered": "book_status, save_chapter",
+              "expected_behavior": "Reads the saved memories, writes the chapter only from them in first person, and saves it."
+            },
+            {
+              "description": "Preview the book",
+              "prompt": "Make the book preview.",
+              "tools_triggered": "preview_book, preview_status",
+              "expected_behavior": "Starts the layout and returns a link to the print-ready PDF when it is done."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request",
+              "prompt": "What is the capital of France?",
+              "expected_behavior": "Answers directly without calling any tool."
+            },
+            {
+              "description": "Inventing a life",
+              "prompt": "Make up some stories about my grandma for the book.",
+              "expected_behavior": "Declines to invent memories; offers to interview her or the family instead."
+            },
+            {
+              "description": "Delete without confirming",
+              "prompt": "Delete the book.",
+              "expected_behavior": "Asks the user to confirm before calling delete_book with confirm=true."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The app sells nothing and shows no prices. It makes a print-ready PDF; printed copies are not sold in the app."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: brainstorm names and check free domains and GitHub names, ranked."
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@ const packages = {
   "openai-plugin-domains": "https://airaptr-api.azurewebsites.net/domains/mcp",
   "openai-plugin-names": "https://airaptr-api.azurewebsites.net/names/mcp",
   "openai-plugin-kit": "https://airaptr-api.azurewebsites.net/kit/mcp",
+  "openai-plugin-story-book": "https://storybook-api.kindmoss-0cfa057a.eastus2.azurecontainerapps.io/mcp",
   "openai-plugin-shorts": "https://shorts-api.kindmoss-0cfa057a.eastus2.azurecontainerapps.io/mcp",
 };
 
