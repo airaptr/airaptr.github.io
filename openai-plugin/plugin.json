@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "raptr-agent-builder",
+  "name": "agent-builder",
   "version": "1.2.0",
   "description": "Turns an idea or a meeting transcript into a working AI agent you can use right away in ChatGPT, with nothing to install.",
   "author": {
@@ -20,16 +20,16 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Raptr Agent Builder",
+        "displayName": "Agent Builder",
         "shortDescription": "Turn any idea into an AI agent",
-        "longDescription": "Describe a task, or paste a meeting transcript, and Raptr Agent Builder turns it into a working AI agent you can use right away, right here in the chat. Nothing to install and no account needed.\n\nBefore building, it searches the open agent registry (RAR), about 1,700 free agents, in case one already does the job. When it builds a new one, it uses the official template and checks the finished agent against the template's rules, fixing problems until it passes. Then ChatGPT runs the agent on your own data, such as a pasted list, a spreadsheet or meeting notes, and shows you the result.\n\nThe agent is a single file you keep. If you want it working on your own computer later, the app explains how to run it with the free Brainstem on Mac, Windows, or Linux.\n\nGood for turning a recurring process into an agent, prototyping an assistant for your team from a meeting, or finding an existing agent before you write one.\n\nAll tools are read-only. The app never runs code on its own servers, installs anything, or connects to your accounts, and it stores nothing you send it.",
+        "longDescription": "Describe a task, or paste a meeting transcript, and Agent Builder turns it into a working AI agent you can use right away, right here in the chat. Nothing to install and no account needed.\n\nBefore building, it searches the open agent registry, about 1,700 free agents, in case one already does the job. When it builds a new one, it uses the official template and checks the finished agent against the template's rules, fixing problems until it passes. Then ChatGPT runs the agent on your own data, such as a pasted list, a spreadsheet or meeting notes, and shows you the result.\n\nThe agent is a single file you keep. If you want it working on your own computer later, the app explains how to run it with the free Brainstem on Mac, Windows, or Linux.\n\nGood for turning a recurring process into an agent, prototyping an assistant for your team from a meeting, or finding an existing agent before you write one.\n\nAll tools are read-only. The app never runs code on its own servers, installs anything, or connects to your accounts, and it stores nothing you send it.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
           "Build a working AI agent from an idea or a meeting transcript",
           "Use the agent right away in the chat on your own data, nothing to install",
           "Check an agent against the template's rules until it passes",
-          "Search about 1,700 free agents in the open agent registry (RAR) and read their code",
+          "Search about 1,700 free agents in the open agent registry and read their code",
           "Explain how to keep an agent running on your own computer"
         ],
         "websiteURL": "https://airaptr.github.io/",
@@ -95,12 +95,12 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments.",
+        "commerce_description": "Agent Builder is free and does not sell products or process payments.",
         "demo_recording_url": "https://airaptr.github.io/demo.mp4"
       },
       "publication": {
         "countries": [],
-        "release_notes": "First release: build single-file AI agents from an idea or transcript, check them against the template, search the open agent registry (RAR), and get run steps for the free Brainstem. Read-only; no account needed."
+        "release_notes": "First release: build single-file AI agents from an idea or transcript, check them against the template, search the open agent registry, and get run steps for the free Brainstem. Read-only; no account needed."
       }
     }
   }

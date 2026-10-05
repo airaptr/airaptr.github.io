@@ -1,4 +1,4 @@
-// Raptr Agent Builder — a ChatGPT app (MCP server over streamable HTTP, stateless JSON responses).
+// Agent Builder — a ChatGPT app (MCP server over streamable HTTP, stateless JSON responses).
 // ChatGPT's own model writes the agent; this server supplies the template, checks the result,
 // searches the public RAR registry, and tells the user how to run it in their own Brainstem.
 
@@ -54,7 +54,7 @@ const TOOLS = [
     name: "find_agents",
     title: "Find existing agents",
     description:
-      "Searches the open agent registry (RAR) (RAR, about 1,700 single-file agents) for agents that already do what the user wants, " +
+      "Searches the open agent registry (about 1,700 single-file agents) for agents that already do what the user wants, " +
       "for example when they ask 'is there an AI tool for...' or want a ready-made automation instead of building one. " +
       "Use it before building from scratch, or when the user asks whether an agent exists for a task.",
     inputSchema: {
@@ -116,7 +116,7 @@ const TOOLS = [
     title: "Share an agent with everyone",
     description:
       "Use only when the user says they want to share an agent they built. Checks the agent and scans it for personal details " +
-      "(emails, phone numbers, secrets), then explains how to publish it to the free open agent registry (RAR) under their own GitHub account. " +
+      "(emails, phone numbers, secrets), then explains how to publish it to the free open agent registry under their own GitHub account. " +
       "Nothing is published by this tool.",
     inputSchema: {
       type: "object",
@@ -275,7 +275,7 @@ const TOOLS = [
 // Each ChatGPT listing is the same server with its own set of tools.
 const PROFILES = {
   builder: {
-    server: { name: "raptr-agent-builder", version: "1.2.0" },
+    server: { name: "agent-builder", version: "1.2.0" },
     tools: ["get_agent_template", "check_agent", "use_agent_here", "find_agents", "get_agent_code", "share_agent", "how_to_run_agent", "request_service"],
     instructions:
       "Build single-file AI agents people can use immediately: get_agent_template, write the agent, check_agent until it passes, then use_agent_here " +
@@ -283,36 +283,36 @@ const PROFILES = {
       "an agent on their own computer later. share_agent only when the user asks to share.",
   },
   finder: {
-    server: { name: "raptr-agent-finder", version: "1.0.0" },
+    server: { name: "agent-finder", version: "1.0.0" },
     tools: ["find_agents", "get_agent_code", "use_agent_here", "how_to_run_agent", "request_service"],
     instructions:
-      "Find free, ready-made AI agents for a task in the open agent registry (RAR): find_agents, then get_agent_code for the best match, then " +
+      "Find free, ready-made AI agents for a task in the open agent registry: find_agents, then get_agent_code for the best match, then " +
       "use_agent_here to run it in this chat on the user's own data. Nothing to install.",
   },
   names: {
-    server: { name: "raptr-names", version: "1.0.0" },
+    server: { name: "name-finder", version: "1.0.0" },
     tools: ["check_names", "check_domain", "register_domain", "request_service"],
     instructions:
       "Help people name a business, product or project and make sure they can actually own the name: brainstorm candidates that fit what they " +
       "describe, check them with check_names, explain the trade-offs in plain words, and keep iterating until they have a name with a free domain.",
   },
   domains: {
-    server: { name: "raptr-domains", version: "1.0.0" },
+    server: { name: "domain-check", version: "1.0.0" },
     tools: ["check_domain", "register_domain", "request_service"],
     instructions:
       "Help people and agents find and register domain names: suggest good names, check them with check_domain (up to 20 at once), " +
       "and explain how to buy with register_domain. Prices are in US dollars and include the first term.",
   },
   kit: {
-    server: { name: "airaptr-business-kit", version: "1.0.0" },
+    server: { name: "business-kit", version: "1.0.0" },
     tools: ["burn_rate", "find_outliers", "content_seeds", "setup_checklist", "request_service"],
     instructions:
-      "Tools for running a small business with AI, from the Airaptr guides: burn_rate checks monthly costs against a cap, find_outliers spots videos " +
+      "Tools for running a small business with AI, from our guides: burn_rate checks monthly costs against a cap, find_outliers spots videos " +
       "that beat their channel, content_seeds turns a work log into content ideas, setup_checklist tracks the channel/newsletter/store setup. " +
       "Ask for the numbers you need, call the tool, then explain the result in plain words.",
   },
   world: {
-    server: { name: "dogg-world-check", version: "1.0.0" },
+    server: { name: "world-check", version: "1.0.0" },
     tools: ["world_now", "fingerprint_text", "request_service"],
     instructions:
       "Give verified, citable numbers about the world right now with world_now: always quote the tick number, time and fingerprint with the numbers. " +
@@ -695,10 +695,10 @@ function llmsTxt(origin) {
 
 ## MCP servers (streamable HTTP, no auth)
 
-- [Raptr Agent Builder](${origin}/mcp): get_agent_template, check_agent, use_agent_here, find_agents, get_agent_code, share_agent, how_to_run_agent
-- [Raptr Agent Finder](${origin}/finder/mcp): find_agents, get_agent_code, use_agent_here, how_to_run_agent
-- [DOGG World Check](${origin}/world/mcp): world_now, fingerprint_text
-- [Raptr Domains](${origin}/domains/mcp): check_domain, register_domain
+- [Agent Builder](${origin}/mcp): get_agent_template, check_agent, use_agent_here, find_agents, get_agent_code, share_agent, how_to_run_agent
+- [Agent Finder](${origin}/finder/mcp): find_agents, get_agent_code, use_agent_here, how_to_run_agent
+- [World Check](${origin}/world/mcp): world_now, fingerprint_text
+- [Domain Check](${origin}/domains/mcp): check_domain, register_domain
 
 ## Pay per call (x402 v2, USDC)
 
@@ -713,7 +713,7 @@ function llmsTxt(origin) {
 
 - [Website](${SITE}): what it does, in plain words
 - [Source](https://github.com/airaptr/airaptr.github.io): server code, listing packages, tests
-- [Agent registry](https://kody-w.github.io/RAR/): the open agent registry (RAR)
+- [Agent registry](https://kody-w.github.io/RAR/): the open agent registry
 - [Privacy](${SITE}privacy.html) and [Terms](${SITE}terms.html)
 `;
 }
@@ -735,8 +735,8 @@ function mcpWellKnown(origin) {
 }
 
 const A2A_SKILLS = [
-  { id: "find_agents", name: "Find agents", description: "Search the open agent registry (RAR) (about 1,700 single-file agents) for agents that do a task. Send the task in plain words.", tags: ["agents", "registry", "search"], examples: ["agents that summarize sales calls", "invoice processing"] },
-  { id: "world_now", name: "World now", description: "Verified snapshot of world numbers right now (Bitcoin, FX, earthquakes, space weather, ISS) with the public DOGG tick, time and SHA-256 fingerprint.", tags: ["world-data", "verification"], examples: ["what is happening in the world right now"] },
+  { id: "find_agents", name: "Find agents", description: "Search the open agent registry (about 1,700 single-file agents) for agents that do a task. Send the task in plain words.", tags: ["agents", "registry", "search"], examples: ["agents that summarize sales calls", "invoice processing"] },
+  { id: "world_now", name: "World now", description: "Verified snapshot of world numbers right now (Bitcoin, FX, earthquakes, space weather, ISS) with the public world tick, time and SHA-256 fingerprint.", tags: ["world-data", "verification"], examples: ["what is happening in the world right now"] },
   { id: "agent_template", name: "Agent template", description: "The official single-file agent template and its rules, so the calling agent can write a new agent.", tags: ["agents", "template"], examples: ["give me the agent template"] },
 ];
 
@@ -786,7 +786,7 @@ async function handleA2A(msg) {
   if (skill === "world_now") r = await worldNow();
   else if (skill === "agent_template") r = getTemplate();
   else r = await findAgents({ query: text, limit: 5 });
-  usage({ server: { name: "rapp-a2a" } }, skill, !r.isError);
+  usage({ server: { name: "agent-a2a" } }, skill, !r.isError);
   const contextId = m.contextId || crypto.randomUUID();
   if (v1) {
     return {

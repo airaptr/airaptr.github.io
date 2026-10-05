@@ -1,4 +1,4 @@
-// Raptr Domains: agent-first domain names. Checking and pricing are free and keyless
+// Domain Check: agent-first domain names. Checking and pricing are free and keyless
 // (public RDAP + Porkbun's public price list). Registration is paid per call over x402 and
 // fulfilled through the Wildhaven Porkbun account; it stays off until PORKBUN_API_KEY is set.
 

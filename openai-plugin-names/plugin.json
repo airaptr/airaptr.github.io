@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "raptr-names",
+  "name": "name-finder",
   "version": "1.0.0",
   "description": "Name a business, product or project, and check the domains and GitHub name are free.",
   "author": {
@@ -20,9 +20,9 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Raptr Names",
+        "displayName": "Name Finder",
         "shortDescription": "Name it, then own the name",
-        "longDescription": "Starting a business, a side hustle, an app or a podcast? Raptr Names brainstorms names with you and checks, for each one, which domains are actually free (.com, .co, .ai, .io and .app by default, or any endings you choose) and whether the GitHub name is free.\n\nIt checks up to 8 names at a time, ranks them (a free .com counts most), shows the price of each free domain including the first term, and keeps suggesting new options until you have a name you can really own.\n\nChecking is free and needs no account. Nothing you search for is stored.",
+        "longDescription": "Starting a business, a side hustle, an app or a podcast? Name Finder brainstorms names with you and checks, for each one, which domains are actually free (.com, .co, .ai, .io and .app by default, or any endings you choose) and whether the GitHub name is free.\n\nIt checks up to 8 names at a time, ranks them (a free .com counts most), shows the price of each free domain including the first term, and keeps suggesting new options until you have a name you can really own.\n\nChecking is free and needs no account. Nothing you search for is stored.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
@@ -95,7 +95,7 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+        "commerce_description": "Agent Builder is free and does not sell products or process payments."
       },
       "publication": {
         "countries": [],

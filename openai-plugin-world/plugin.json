@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "dogg-world-check",
+  "name": "world-check",
   "version": "1.0.0",
   "description": "Verified, citable numbers about the world right now, each with a public tick and SHA-256 fingerprint.",
   "author": {
@@ -20,9 +20,9 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "DOGG World Check",
+        "displayName": "World Check",
         "shortDescription": "Verified world numbers, now",
-        "longDescription": "Ask what's happening in the world right now and get numbers you can trust and cite: Bitcoin price and block height, the crypto market, major currency exchange rates, earthquakes in the past hour, space weather and where the International Space Station is.\n\nEvery answer comes from one public snapshot of the DOGG world tick, with its tick number, time and SHA-256 fingerprint, so anyone can check later exactly what the numbers were and where they came from.\n\nIt can also fingerprint a piece of text, so you can tell whether two documents are exactly identical.\n\nAll tools are read-only. No account needed, and nothing you send is stored. Numbers are for information only, not financial, safety or emergency advice.",
+        "longDescription": "Ask what's happening in the world right now and get numbers you can trust and cite: Bitcoin price and block height, the crypto market, major currency exchange rates, earthquakes in the past hour, space weather and where the International Space Station is.\n\nEvery answer comes from one public snapshot of the public world tick, with its tick number, time and SHA-256 fingerprint, so anyone can check later exactly what the numbers were and where they came from.\n\nIt can also fingerprint a piece of text, so you can tell whether two documents are exactly identical.\n\nAll tools are read-only. No account needed, and nothing you send is stored. Numbers are for information only, not financial, safety or emergency advice.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
@@ -95,7 +95,7 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+        "commerce_description": "Agent Builder is free and does not sell products or process payments."
       },
       "publication": {
         "countries": [],

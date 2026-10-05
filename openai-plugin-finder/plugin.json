@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "raptr-agent-finder",
+  "name": "agent-finder",
   "version": "1.0.0",
-  "description": "Search about 1,700 free AI agents in the open agent registry (RAR) and use one right away in ChatGPT.",
+  "description": "Search about 1,700 free AI agents in the open agent registry and use one right away in ChatGPT.",
   "author": {
     "name": "Wildhaven Homes LLC",
     "url": "https://airaptr.github.io/"
@@ -20,13 +20,13 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Raptr Agent Finder",
+        "displayName": "Agent Finder",
         "shortDescription": "Find a free AI agent for it",
-        "longDescription": "Ask whether there's already an AI agent for a task, and Raptr Agent Finder searches the open agent registry (RAR), about 1,700 free single-file agents for sales, operations, finance, support, meetings and more.\n\nIt shows the best matches in plain words, lets you read any agent's code, and then ChatGPT can use the agent right away on your own data in the same chat. Nothing to install and no account needed. If you want to keep an agent on your own computer later, it explains how.\n\nAll tools are read-only. The app never runs code on its own servers or connects to your accounts, and it stores nothing you send it.",
+        "longDescription": "Ask whether there's already an AI agent for a task, and Agent Finder searches the open agent registry, about 1,700 free single-file agents for sales, operations, finance, support, meetings and more.\n\nIt shows the best matches in plain words, lets you read any agent's code, and then ChatGPT can use the agent right away on your own data in the same chat. Nothing to install and no account needed. If you want to keep an agent on your own computer later, it explains how.\n\nAll tools are read-only. The app never runs code on its own servers or connects to your accounts, and it stores nothing you send it.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
-          "Search about 1,700 free agents in the open agent registry (RAR)",
+          "Search about 1,700 free agents in the open agent registry",
           "Show the best matches in plain words",
           "Read the full code of any agent",
           "Use an agent right away in the chat on your own data",
@@ -95,11 +95,11 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+        "commerce_description": "Agent Builder is free and does not sell products or process payments."
       },
       "publication": {
         "countries": [],
-        "release_notes": "First release. Search about 1,700 free AI agents in the open agent registry (RAR) and use one right away in ChatGPT."
+        "release_notes": "First release. Search about 1,700 free AI agents in the open agent registry and use one right away in ChatGPT."
       }
     }
   }

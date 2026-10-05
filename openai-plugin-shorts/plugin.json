@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "airaptr-shorts",
+  "name": "shorts-maker",
   "version": "1.0.0",
   "description": "Turn videos you watched and your ideas into original, credited vertical shorts.",
   "author": {
@@ -20,9 +20,9 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Airaptr Shorts",
+        "displayName": "Shorts Maker",
         "shortDescription": "Your take, as a finished short",
-        "longDescription": "Tell it about a video you watched or an idea you have. Airaptr Shorts helps you write your own take, then renders a finished vertical short: narrated, captioned, animated, with your channel name on the closing card.\n\nEvery short is original commentary: it credits the creator in the video and the description, quotes at most one short line, and never uses anyone's footage. You get a video file and a contact sheet to check it. Nothing is posted anywhere.\n\nRendering takes about 5 to 10 minutes. Making shorts requires an Airaptr account; the app asks for your license key.",
+        "longDescription": "Tell it about a video you watched or an idea you have. Shorts Maker helps you write your own take, then renders a finished vertical short: narrated, captioned, animated, with your channel name on the closing card.\n\nEvery short is original commentary: it credits the creator in the video and the description, quotes at most one short line, and never uses anyone's footage. You get a video file and a contact sheet to check it. Nothing is posted anywhere.\n\nRendering takes about 5 to 10 minutes. Making shorts requires an account; the app asks for your license key.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
@@ -75,7 +75,7 @@
               "description": "No key",
               "prompt": "Make a short about morning routines for my channel Fernwood.",
               "tools_triggered": "shorts_guide",
-              "expected_behavior": "Asks for the license key before rendering; if the user has none, explains that making shorts needs an Airaptr account and gives the informational page."
+              "expected_behavior": "Asks for the license key before rendering; if the user has none, explains that making shorts needs an account and gives the informational page."
             }
           ],
           "negative": [
@@ -97,7 +97,7 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "The app sells nothing and shows no prices. Rendering requires an existing Airaptr account (license key), entered like a sign-in."
+        "commerce_description": "The app sells nothing and shows no prices. Rendering requires an existing account (license key), entered like a sign-in."
       },
       "publication": {
         "countries": [],

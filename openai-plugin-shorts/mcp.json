@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "airaptr-shorts": {
+    "shorts-maker": {
       "type": "streamable-http",
       "url": "https://shorts-api.kindmoss-0cfa057a.eastus2.azurecontainerapps.io/mcp"
     }

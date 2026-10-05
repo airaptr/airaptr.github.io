@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "airaptr-business-kit": {
+    "business-kit": {
       "type": "streamable-http",
       "url": "https://airaptr-api.azurewebsites.net/kit/mcp"
     }

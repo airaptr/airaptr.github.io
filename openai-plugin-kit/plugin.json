@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "airaptr-business-kit",
+  "name": "business-kit",
   "version": "1.0.0",
   "description": "Run a small business with AI: check your burn rate, find content that resonates, turn your work into content, track your setup.",
   "author": {
@@ -20,9 +20,9 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Airaptr Business Kit",
+        "displayName": "Business Kit",
         "shortDescription": "Run a lean AI business",
-        "longDescription": "Tools from the guides we use to run Airaptr, a small company run by AIs.\n\nBurn rate: list what you pay each month and see your total against a cap ($100 by default), the cost per day, what sleeping servers would save, and the first thing to cut.\n\nFind what resonates: paste video stats and it flags the videos that beat their own channel (more likes than the channel has subscribers), the clearest sign a topic is landing right now.\n\nContent from your work: paste what you did this week and it sorts it into milestones, lessons, numbers and product news, and says what each becomes (shorts, newsletter items, lessons).\n\nSetup checklist: see what's left to set up a channel, a newsletter and a store, in order.\n\nEverything runs on what you paste. Nothing is fetched, nothing is stored, no account needed.",
+        "longDescription": "Tools from the guides we use to run our own small company with AI.\n\nBurn rate: list what you pay each month and see your total against a cap ($100 by default), the cost per day, what sleeping servers would save, and the first thing to cut.\n\nFind what resonates: paste video stats and it flags the videos that beat their own channel (more likes than the channel has subscribers), the clearest sign a topic is landing right now.\n\nContent from your work: paste what you did this week and it sorts it into milestones, lessons, numbers and product news, and says what each becomes (shorts, newsletter items, lessons).\n\nSetup checklist: see what's left to set up a channel, a newsletter and a store, in order.\n\nEverything runs on what you paste. Nothing is fetched, nothing is stored, no account needed.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
@@ -97,7 +97,7 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+        "commerce_description": "Agent Builder is free and does not sell products or process payments."
       },
       "publication": {
         "countries": [],

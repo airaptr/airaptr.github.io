@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "dogg-world-check": {
+    "world-check": {
       "type": "streamable-http",
       "url": "https://airaptr-api.azurewebsites.net/world/mcp"
     }

@@ -1,4 +1,4 @@
-// Airaptr Business Kit: the tools from our guides, as one free MCP server we use ourselves.
+// Business Kit: the tools from our guides, as one free MCP server we use ourselves.
 // Read-only and deterministic: nothing is fetched, nothing is stored.
 
 const GUMROAD = "https://airaptr.gumroad.com";

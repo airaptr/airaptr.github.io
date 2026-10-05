@@ -1,6 +1,6 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "raptr-domains",
+  "name": "domain-check",
   "version": "1.0.0",
   "description": "Find, check and price domain names, and register them.",
   "author": {
@@ -20,9 +20,9 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Raptr Domains",
+        "displayName": "Domain Check",
         "shortDescription": "Find and check domain names",
-        "longDescription": "Naming a business, a project or a side hustle? Raptr Domains checks whether domain names are free and what they cost, up to 20 at a time, so ChatGPT can brainstorm names with you and tell you straight away which ones you can actually get.\n\nIt asks each registry directly, so availability is current, and prices include the first term (some endings, like .ai, require two years). When you find the one you want, it explains how to register it: we can register it for you, and AI agents can buy it directly, paying per request.\n\nChecking is free and needs no account. Nothing you search for is stored.",
+        "longDescription": "Naming a business, a project or a side hustle? Domain Check checks whether domain names are free and what they cost, up to 20 at a time, so ChatGPT can brainstorm names with you and tell you straight away which ones you can actually get.\n\nIt asks each registry directly, so availability is current, and prices include the first term (some endings, like .ai, require two years). When you find the one you want, it explains how to register it: we can register it for you, and AI agents can buy it directly, paying per request.\n\nChecking is free and needs no account. Nothing you search for is stored.",
         "developerName": "Wildhaven Homes LLC",
         "category": "Productivity",
         "capabilities": [
@@ -95,7 +95,7 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "Raptr Agent Builder is free and does not sell products or process payments."
+        "commerce_description": "Agent Builder is free and does not sell products or process payments."
       },
       "publication": {
         "countries": [],
