@@ -202,6 +202,61 @@ const TOOLS = [
     annotations: READ_ONLY,
   },
   {
+    name: "burn_rate",
+    title: "Check your monthly burn rate",
+    description: "Use when someone running a small business or side project lists what they pay each month (servers, software, AI, domains) and wants to know their burn rate. Totals it, compares it with a monthly cap ($100 by default), shows the per-day cost and what running servers fewer hours would save, and names the first thing to cut.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        costs: { type: "array", maxItems: 50, items: { type: "object", properties: { item: { type: "string" }, monthly: { type: "number", description: "US dollars per month" }, always_on: { type: "boolean", description: "false for usage-based costs" } }, required: ["item", "monthly"] } },
+        cap: { type: "number", description: "Monthly cap in US dollars, default 100" },
+        hours_per_day: { type: "number", description: "Optional: hours a day the servers would run if they slept" },
+      },
+      required: ["costs"],
+      additionalProperties: false,
+    },
+    annotations: READ_ONLY,
+  },
+  {
+    name: "find_outliers",
+    title: "Find videos that beat their channel",
+    description: "Use when someone researching content ideas gives video stats (title, channel subscribers, likes, views). Flags the videos that beat their own channel: more likes than the channel has subscribers, or several times the views. Those are the topics resonating right now.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        videos: { type: "array", maxItems: 100, items: { type: "object", properties: { title: { type: "string" }, channel: { type: "string" }, url: { type: "string" }, subscribers: { type: "number" }, likes: { type: "number" }, views: { type: "number" } }, required: ["title", "subscribers"] } },
+        min_like_ratio: { type: "number", description: "Likes per subscriber to count as an outlier, default 1" },
+        min_view_ratio: { type: "number", description: "Views per subscriber to count as an outlier, default 3" },
+      },
+      required: ["videos"],
+      additionalProperties: false,
+    },
+    annotations: READ_ONLY,
+  },
+  {
+    name: "content_seeds",
+    title: "Turn your work into content ideas",
+    description: "Use when someone pastes what they worked on (a list of tasks or commit messages) and wants content from it. Sorts each line into milestones, lessons, numbers, product news and build notes, and says what each kind becomes: shorts, newsletter items, course lessons.",
+    inputSchema: {
+      type: "object",
+      properties: { work: { type: "array", maxItems: 100, items: { type: "string" }, description: "One line per thing done" } },
+      required: ["work"],
+      additionalProperties: false,
+    },
+    annotations: READ_ONLY,
+  },
+  {
+    name: "setup_checklist",
+    title: "AI business stack checklist",
+    description: "Use when someone is setting up a small online business (YouTube channel, newsletter, store) and wants to know what's next. Pass the steps already done; returns what's left, in order, with time estimates.",
+    inputSchema: {
+      type: "object",
+      properties: { done: { type: "array", items: { type: "string", enum: ["account", "youtube", "newsletter", "store", "first_short", "first_issue", "first_product"] } } },
+      additionalProperties: false,
+    },
+    annotations: READ_ONLY,
+  },
+  {
     name: "request_service",
     title: "Ask us to build something",
     description:
@@ -247,6 +302,14 @@ const PROFILES = {
     instructions:
       "Help people and agents find and register domain names: suggest good names, check them with check_domain (up to 20 at once), " +
       "and explain how to buy with register_domain. Prices are in US dollars and include the first term.",
+  },
+  kit: {
+    server: { name: "airaptr-business-kit", version: "1.0.0" },
+    tools: ["burn_rate", "find_outliers", "content_seeds", "setup_checklist", "request_service"],
+    instructions:
+      "Tools for running a small business with AI, from the Airaptr guides: burn_rate checks monthly costs against a cap, find_outliers spots videos " +
+      "that beat their channel, content_seeds turns a work log into content ideas, setup_checklist tracks the channel/newsletter/store setup. " +
+      "Ask for the numbers you need, call the tool, then explain the result in plain words.",
   },
   world: {
     server: { name: "dogg-world-check", version: "1.0.0" },
@@ -567,6 +630,10 @@ async function callTool(name, args) {
     case "how_to_run_agent": return howToRun(args);
     case "share_agent": return shareAgent(args);
     case "world_now": return worldNow();
+    case "burn_rate": return (await import("./kit.js")).burnRate(args);
+    case "find_outliers": return (await import("./kit.js")).findOutliers(args);
+    case "content_seeds": return (await import("./kit.js")).contentSeeds(args);
+    case "setup_checklist": return (await import("./kit.js")).setupChecklist(args);
     case "fingerprint_text": return fingerprintText(args);
     case "request_service": return (await import("./signals.js")).recordRequest(activeEnv, { request: args.request, listing: currentListing });
     case "check_names": return (await import("./domains.js")).checkNames(args);
@@ -829,7 +896,7 @@ export default {
     if (url.pathname === "/" || url.pathname === "/health") {
       return json({ ok: true, listings: Object.fromEntries(Object.entries(PROFILES).map(([k, p]) => [p.server.name, { version: p.server.version, mcp: `${url.origin}${k === "builder" ? "" : "/" + k}/mcp` }])), site: SITE });
     }
-    const route = { "/mcp": "builder", "/finder/mcp": "finder", "/world/mcp": "world", "/domains/mcp": "domains", "/names/mcp": "names" }[url.pathname];
+    const route = { "/mcp": "builder", "/finder/mcp": "finder", "/world/mcp": "world", "/domains/mcp": "domains", "/names/mcp": "names", "/kit/mcp": "kit" }[url.pathname];
     if (!route) return json({ error: "not found" }, 404);
     const profile = PROFILES[route];
     if (request.method === "GET") return new Response("SSE stream not offered; POST JSON-RPC to /mcp.", { status: 405, headers: { Allow: "POST", ...CORS } });
