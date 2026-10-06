@@ -2,7 +2,11 @@
 # Raptr installer: puts a `raptr` command on your PATH. Needs only Python 3.8+.
 #   curl -fsSL https://airaptr.github.io/raptr/install.sh | sh
 set -e
-SRC="${RAPTR_SRC:-https://raw.githubusercontent.com/airaptr/raptr/main/raptr.py}"
+if [ -z "${RAPTR_SRC:-}" ]; then
+  printf '%s\n' "Airaptr is in private build right now, so the public installer is paused." "Try it in your browser meanwhile: https://airaptr.github.io/raptr/"
+  exit 0
+fi
+SRC="$RAPTR_SRC"
 HOME_DIR="${RAPTR_HOME:-$HOME/.raptr}"
 BIN_DIR="${RAPTR_BIN:-$HOME/.local/bin}"
 
