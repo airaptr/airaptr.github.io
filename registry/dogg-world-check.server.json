@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.airaptr/dogg-world-check",
+  "name": "com.airaptr/dogg-world-check",
   "description": "Verified, citable world numbers right now, each with a public tick and SHA-256 fingerprint.",
   "version": "1.0.0",
   "repository": {
@@ -11,7 +11,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://airaptr-api.azurewebsites.net/world/mcp"
+      "url": "https://api.airaptr.com/world/mcp"
     }
   ]
 }
