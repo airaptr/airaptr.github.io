@@ -11,6 +11,7 @@
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { x402HTTPResourceServer } from "@x402/core/http";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
+import { declareDiscoveryExtension, bazaarResourceServerExtension } from "@x402/extensions/bazaar";
 import { orderQuote, fulfilmentReady } from "./domains.js";
 import { paidConfig } from "./paycfg.js";
 
@@ -22,6 +23,87 @@ const METHOD = { "/x402/world": "GET", "/x402/domains/register": "POST", "/x402/
 
 let cached = null;
 
+// ---------- Bazaar discovery (x402 extension): how to call each paid route and what comes back ----------
+// Coinbase's facilitator lists a route in the x402 Bazaar after it settles a payment for it. Descriptions stay plain:
+// what the route does, what it takes, what it costs and when it charges. /x402/domains/register is not declared.
+
+const RESCUE_SAMPLE = "Guideline 2.1 - Performance - App Completeness\n\nThe app crashed on launch on iPad Air (5th generation) running iPadOS 18.\n\n1. Please provide a demo account.";
+const str = { type: "string" };
+const strs = { type: "array", items: str };
+
+export const DISCOVERY_TEXT = {
+  "/x402/rescue": "Rejection Rescue: send the text of an Apple App Review rejection; get back, for each cited guideline the playbook covers, what it means, likely causes, checks and a fix list, plus a reply draft to App Review that answers each of Apple's questions. Text that cites no covered guideline is refused before payment. Charged only when the output is delivered.",
+  "/x402/world": "DOGG World Check: a fresh snapshot of public world numbers (Bitcoin price and block height, crypto market, USD exchange rates, earthquakes in the past hour, space weather, Space Station position) with the snapshot's tick, time and SHA-256 fingerprint, checkable against the public feed.",
+};
+
+async function rescueDiscovery() {
+  const { rescue, withReceipt } = await import("./rescue.js");
+  const item = {
+    type: "object",
+    properties: {
+      section: str, playbook: str, title: str, means: str,
+      likely_causes: strs, check: strs, evidence: strs, fix: strs,
+    },
+  };
+  return declareDiscoveryExtension({
+    bodyType: "json",
+    input: { text: RESCUE_SAMPLE },
+    inputSchema: {
+      properties: {
+        text: { type: "string", description: "Apple's rejection message, as received (cites guidelines such as \"Guideline 2.1\"). Up to 20 KB." },
+        changes: { type: "string", description: "Optional: what you changed; fills the reply draft's list of changes." },
+        recording_url: { type: "string", description: "Optional: link to a screen recording on a real device; fills the reply draft's recording link." },
+      },
+      required: ["text"],
+    },
+    output: {
+      // A real output for the sample input above (the playbook as deployed).
+      example: await withReceipt({ product: "rejection-rescue", ...rescue(RESCUE_SAMPLE) }),
+      schema: {
+        type: "object",
+        properties: {
+          product: { type: "string", const: "rejection-rescue" },
+          sections: { ...strs, description: "Guideline sections cited in the text, in order." },
+          items: { type: "array", items: item, description: "One entry per cited section the playbook covers." },
+          unknown_sections: { ...strs, description: "Cited sections the playbook does not cover." },
+          apple_asked: { ...strs, description: "Apple's numbered asks and direct questions." },
+          cards: { ...strs, description: "The fix list, one line per step, tagged with its section." },
+          reply_draft: { type: "string", description: "A reply to App Review; bracketed placeholders mark what is still missing." },
+          reply_ready: { type: "boolean" },
+          reply_missing: strs,
+          sha256: { type: "string", description: "SHA-256 of this object without sha256 and sha256_of, as canonical JSON." },
+          sha256_of: { type: "string" },
+        },
+        required: ["product", "sections", "items", "cards", "reply_draft", "reply_ready", "sha256"],
+      },
+    },
+  });
+}
+
+function worldDiscovery() {
+  return declareDiscoveryExtension({
+    output: {
+      example: {
+        data: { btc_usd: { spot: "82314.085" }, btc_block_height: { height: 971620 }, fx_usd: { EUR: "0.8944", GBP: "0.7562" }, earthquakes_past_hour: { count: 6, max_mag: "3.6" }, space_weather: { kp: "3.0" }, iss: { lat: "26.393", lon: "-109.679" } },
+        proof: { tick: 2792, time_utc: "2026-10-15T20:21:10.296Z", fingerprint: "614d76483ef1dbd6ee8d68a44c66f45fcb22d2ebb63deb0b31b2882a95f2c2b9", tick_fingerprint: "32f9a4f62c713dd76239798191d3c3dd0162ba217d47bf266a4d44fd6a4195d7", source: "https://kody-w.github.io/dogg/orient.json" },
+        summary: "Bitcoin: $82,314\n...\n\nVerified snapshot: tick 2792 at 2026-10-15T20:21:10.296Z, fingerprint 614d7648...",
+      },
+      schema: {
+        type: "object",
+        properties: {
+          data: { type: "object", description: "The snapshot's numbers, keyed by source (btc_usd, fx_usd, iss, ...). Keys can vary with the feed." },
+          proof: {
+            type: "object",
+            properties: { tick: { type: "number" }, time_utc: str, fingerprint: str, tick_fingerprint: str, source: str },
+          },
+          summary: { type: "string", description: "The same numbers as plain text." },
+        },
+        required: ["data", "proof", "summary"],
+      },
+    },
+  });
+}
+
 async function server(cfg, env = {}) {
   const key = JSON.stringify(cfg);
   if (cached && cached.key === key) return cached.http;
@@ -32,12 +114,17 @@ async function server(cfg, env = {}) {
   const facilitator = cfg.cdp
     ? (await import("@coinbase/x402")).createFacilitatorConfig(get("CDP_API_KEY_ID"), get("CDP_API_KEY_SECRET"))
     : { url: cfg.facilitator };
-  const resource = new x402ResourceServer(new HTTPFacilitatorClient(facilitator)).register("eip155:*", new ExactEvmScheme());
+  const resource = new x402ResourceServer(new HTTPFacilitatorClient(facilitator))
+    .register("eip155:*", new ExactEvmScheme())
+    .registerExtension(bazaarResourceServerExtension);
   const http = new x402HTTPResourceServer(resource, {
     "GET /x402/world": {
       accepts: { scheme: "exact", network: cfg.network, payTo: cfg.payTo, price: cfg.price },
-      description: "DOGG World Check: a fresh, verified snapshot of world numbers (Bitcoin, FX, earthquakes, space weather, ISS) with the public tick, time and SHA-256 fingerprint.",
+      description: DISCOVERY_TEXT["/x402/world"],
       mimeType: "application/json",
+      serviceName: "DOGG World Check",
+      tags: ["world-data", "bitcoin", "exchange-rates", "earthquakes", "snapshot"],
+      extensions: worldDiscovery(),
     },
     // Price is the live registrar price plus margin for the domain in ?domain=, quoted per order.
     "POST /x402/domains/register": {
@@ -52,8 +139,11 @@ async function server(cfg, env = {}) {
     },
     "POST /x402/rescue": {
       accepts: { scheme: "exact", network: cfg.network, payTo: cfg.payTo, price: cfg.priceRescue },
-      description: "Rejection Rescue: the full diagnosis, fix list and App Review reply draft for an Apple rejection message. Charged only when the output is delivered.",
+      description: DISCOVERY_TEXT["/x402/rescue"],
       mimeType: "application/json",
+      serviceName: "airaptr Rejection Rescue",
+      tags: ["app-store", "app-review", "ios", "rejection"],
+      extensions: await rescueDiscovery(),
     },
   });
   await http.initialize();

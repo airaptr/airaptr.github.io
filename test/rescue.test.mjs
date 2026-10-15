@@ -159,6 +159,34 @@ test("/x402/rescue without payment: 402 with the rescue price on Base Sepolia, n
   assert.equal(calls.verify + calls.settle, 0);
 });
 
+test("402s carry a valid Bazaar discovery block: /x402/rescue (POST JSON in, rescue report out) and /x402/world", async () => {
+  const { validateAndExtract } = await import("@x402/extensions/bazaar");
+  const req = decode((await post("/x402/rescue", { text: ROUND2 })).headers.get("payment-required"));
+  const bz = req.extensions?.bazaar;
+  assert.ok(bz, "bazaar extension present");
+  const v = validateAndExtract(bz);
+  assert.equal(v.valid, true, JSON.stringify(v.errors));
+  assert.equal(bz.info.input.type, "http");
+  assert.equal(bz.info.input.method, "POST");
+  assert.equal(bz.info.input.bodyType, "json");
+  assert.equal(typeof bz.info.input.body.text, "string");
+  assert.deepEqual(bz.schema.properties.input.properties.body.required, ["text"]);
+  // The output example is a real rescue report, receipt included.
+  const ex = bz.info.output.example;
+  assert.equal(ex.product, "rejection-rescue");
+  assert.deepEqual(ex.sections, ["2.1"]);
+  assert.ok(ex.items[0].fix.length && ex.reply_draft);
+  await checkReceipt(ex);
+  assert.ok(req.resource.description.length <= 500, "the CDP facilitator rejects descriptions over 500 characters");
+  assert.equal(req.resource.serviceName, "airaptr Rejection Rescue");
+
+  const world = decode((await worker.fetch(new Request(B + "/x402/world", { headers: { accept: "application/json" } }), {})).headers.get("payment-required"));
+  const wv = validateAndExtract(world.extensions.bazaar);
+  assert.equal(wv.valid, true, JSON.stringify(wv.errors));
+  assert.equal(world.extensions.bazaar.info.input.method, "GET");
+  assert.ok(world.resource.description.length <= 500);
+});
+
 test("X402_PRICE_RESCUE sets the price", async () => {
   process.env.X402_PRICE_RESCUE = "$0.25";
   try {
