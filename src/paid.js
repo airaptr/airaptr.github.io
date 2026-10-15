@@ -25,7 +25,14 @@ let cached = null;
 async function server(cfg, env = {}) {
   const key = JSON.stringify(cfg);
   if (cached && cached.key === key) return cached.http;
-  const resource = new x402ResourceServer(new HTTPFacilitatorClient({ url: cfg.facilitator })).register("eip155:*", new ExactEvmScheme());
+  const get = (k) => env[k] || globalThis.process?.env?.[k];
+  // Real money (Base mainnet) settles through Coinbase's facilitator, authenticated with the CDP key; the free x402.org
+  // facilitator is testnet only. Refuse a mainnet config without the key rather than take payments that can't settle.
+  if (cfg.network === "eip155:8453" && !cfg.cdp) throw new Error("Base mainnet needs CDP_API_KEY_ID and CDP_API_KEY_SECRET");
+  const facilitator = cfg.cdp
+    ? (await import("@coinbase/x402")).createFacilitatorConfig(get("CDP_API_KEY_ID"), get("CDP_API_KEY_SECRET"))
+    : { url: cfg.facilitator };
+  const resource = new x402ResourceServer(new HTTPFacilitatorClient(facilitator)).register("eip155:*", new ExactEvmScheme());
   const http = new x402HTTPResourceServer(resource, {
     "GET /x402/world": {
       accepts: { scheme: "exact", network: cfg.network, payTo: cfg.payTo, price: cfg.price },

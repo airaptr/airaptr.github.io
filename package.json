@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@azure/data-tables": "^13.3.0",
+    "@coinbase/x402": "^2.1.0",
     "@x402/core": "^2.27.0",
-    "@x402/evm": "^2.27.0",
-    "@azure/data-tables": "^13.3.0"
+    "@x402/evm": "^2.27.0"
   },
   "devDependencies": {
     "@x402/fetch": "^2.27.0",
