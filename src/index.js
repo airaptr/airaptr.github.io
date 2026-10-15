@@ -921,13 +921,19 @@ export default {
         if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"text": "<Apple\'s rejection message>"} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
         const { parseInput, withReceipt, rescue, preview } = await import("./rescue.js");
         const parsed = parseInput(await request.text(), request.headers.get("content-type") || "");
-        if (parsed.error) return json(await withReceipt({ error: parsed.error, charged: false }), parsed.status);
-        const { text, changes, recording_url } = parsed.input;
-        const p = preview(text);
-        if (!p.recognized.length) {
-          return json(await withReceipt({ error: "No guideline section in this text is in the playbook, so there is nothing to diagnose. Not charged.", charged: false, sections: p.sections, unknown_sections: p.unknown_sections }), 422);
+        const paying = Boolean(request.headers.get("payment-signature") || request.headers.get("x-payment"));
+        // An empty request with no payment gets the 402 price quote, so catalogs (Coinbase's Bazaar) can list us.
+        // It can never be charged: with no payment header nothing is verified or settled, and produce refuses anyway.
+        if (parsed.empty && !paying) produce = async () => { throw new Error("empty input is never produced"); };
+        else if (parsed.error) return json(await withReceipt({ error: parsed.error, charged: false }), parsed.status);
+        else {
+          const { text, changes, recording_url } = parsed.input;
+          const p = preview(text);
+          if (!p.recognized.length) {
+            return json(await withReceipt({ error: "No guideline section in this text is in the playbook, so there is nothing to diagnose. Not charged.", charged: false, sections: p.sections, unknown_sections: p.unknown_sections }), 422);
         }
         produce = async () => withReceipt({ product: "rejection-rescue", ...rescue(text, { changes, recording_url }) });
+        }
       } else produce = url.pathname === "/x402/domains/register"
         ? async () => {
             const { orderQuote, registerAtPorkbun } = await import("./domains.js");

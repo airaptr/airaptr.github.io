@@ -130,6 +130,7 @@ export async function withReceipt(body) {
 export function parseInput(raw, contentType = "") {
   const size = new TextEncoder().encode(raw).length;
   if (size > MAX_INPUT_BYTES) return { status: 413, error: `Input is ${size} bytes; the limit is ${MAX_INPUT_BYTES} bytes (20 KB). Send only Apple's rejection message.` };
+  if (!raw.trim()) return { status: 400, empty: true, error: 'Empty input. Send {"text": "<Apple\'s rejection message>"}.' };
   let input;
   if (/json/i.test(contentType) || /^\s*\{/.test(raw)) {
     let parsed;
@@ -142,6 +143,6 @@ export function parseInput(raw, contentType = "") {
   } else {
     input = { text: raw, changes: "", recording_url: "" };
   }
-  if (!input.text.trim()) return { status: 400, error: 'Empty input. Send {"text": "<Apple\'s rejection message>"}.' };
+  if (!input.text.trim()) return { status: 400, empty: true, error: 'Empty input. Send {"text": "<Apple\'s rejection message>"}.' };
   return { input };
 }

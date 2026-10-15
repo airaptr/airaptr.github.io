@@ -196,9 +196,34 @@ test("X402_PRICE_RESCUE sets the price", async () => {
   } finally { delete process.env.X402_PRICE_RESCUE; }
 });
 
-test("/x402/rescue refuses empty, oversize, invalid and unrecognized input before payment", async () => {
+test("/x402/rescue: an unpaid empty request gets the price quote (so catalogs can list it), never output", async () => {
   calls.verify = calls.settle = 0;
-  for (const [body, status] of [[{ text: "" }, 400], ["", 400], ["{bad", 400], [{ text: ["a"] }, 400], [{ text: "Guideline 2.1 " + "y".repeat(20 * 1024) }, 413], [{ text: "Guideline 9.9 - Something new" }, 422], [{ text: "no guideline here" }, 422]]) {
+  const bare = (body, type) => worker.fetch(new Request(B + "/x402/rescue", { method: "POST", headers: type ? { "content-type": type } : {}, body }), {});
+  for (const r of [await post("/x402/rescue", { text: "" }), await post("/x402/rescue", {}), await post("/x402/rescue", { text: "  " }),
+                   await bare("", "application/json"), await bare("", null), await bare("  \n", "text/plain")]) {
+    assert.equal(r.status, 402);
+    assert.equal(decode(r.headers.get("payment-required")).accepts[0].amount, "500000");
+    assert.ok(!(await r.text()).includes("reply_draft"));
+  }
+  assert.equal(calls.verify + calls.settle, 0);
+});
+
+test("/x402/rescue: an empty request that carries a payment is refused before verify or settle", async () => {
+  calls.verify = calls.settle = 0;
+  for (const header of ["payment-signature", "x-payment"]) {
+    const r = await worker.fetch(new Request(B + "/x402/rescue", { method: "POST", headers: { "content-type": "application/json", [header]: "eyJ4IjoxfQ==" }, body: JSON.stringify({ text: "" }) }), {});
+    assert.equal(r.status, 400, header);
+    assert.equal(r.headers.get("payment-required"), null);
+    const b = await r.json();
+    assert.equal(b.charged, false);
+    await checkReceipt(b);
+  }
+  assert.equal(calls.verify + calls.settle, 0);
+});
+
+test("/x402/rescue refuses oversize, invalid and unrecognized input before payment", async () => {
+  calls.verify = calls.settle = 0;
+  for (const [body, status] of [["{bad", 400], [{ text: ["a"] }, 400], [{ text: "Guideline 2.1 " + "y".repeat(20 * 1024) }, 413], [{ text: "Guideline 9.9 - Something new" }, 422], [{ text: "no guideline here" }, 422]]) {
     const r = await post("/x402/rescue", body);
     assert.equal(r.status, status, JSON.stringify(body).slice(0, 40));
     assert.equal(r.headers.get("payment-required"), null, "no payment may be asked for");
