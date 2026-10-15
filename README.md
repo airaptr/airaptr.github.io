@@ -23,7 +23,7 @@ points at the public installer.
 | `how_to_run_agent` | Optional: keep it on your computer (Mac, Windows, Linux) |
 | `rejection_rescue_preview` | Free: explains the guideline sections an Apple App Review rejection cites |
 
-**Store:** `GET /store.json` is the catalog for agents. Rejection Rescue: free preview at `POST /rescue/preview`, the full diagnosis and reply draft at `POST /x402/rescue` (x402, `X402_PRICE_RESCUE`, default $0.50, testnet by default). Tests: `node --test test/`.
+**Store:** `GET /store.json` is the catalog for agents. Rejection Rescue: free preview at `POST /rescue/preview`, the full diagnosis and reply draft at `POST /x402/rescue` (x402, `X402_PRICE_RESCUE`, default $0.50, testnet by default). Tests: `node --test test/*.test.mjs`.
 
 ## Develop
 

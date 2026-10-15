@@ -14,9 +14,13 @@ export const MAX_INPUT_BYTES = 20 * 1024;
 const SECTION = /Guideline\s+(\p{Nd}+(?:\.\p{Nd}+){0,3})(\([a-z]+\))?/giu;
 // Python str.splitlines() and str.strip() character sets, so lines and questions come out the same.
 const LINES = /\r\n|[\n\v\f\r\x1c-\x1e\x85\u2028\u2029]/;
-const PY_SPACE = "\\t\\n\\v\\f\\r\\x1c-\\x1f \\x85\\xa0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000";
-const STRIP = new RegExp(`^[${PY_SPACE}]+|[${PY_SPACE}]+$`, "g");
-const pyStrip = (s) => s.replace(STRIP, "");
+const PY_SPACE = new Set([..."\t\n\v\f\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2028\u2029\u202f\u205f\u3000"].concat(Array.from({ length: 11 }, (_, i) => String.fromCharCode(0x2000 + i))));
+function pyStrip(s) { // linear, unlike a /\s+$/-style regex on long runs of spaces
+  let a = 0, b = s.length;
+  while (a < b && PY_SPACE.has(s[a])) a++;
+  while (b > a && PY_SPACE.has(s[b - 1])) b--;
+  return s.slice(a, b);
+}
 const replaceAll = (s, a, b) => s.split(a).join(b); // literal, no $-patterns
 
 /** Sections in the order Apple cites them, de-duplicated, keeping the sub-letter: ["2.1", "5.1.1(i)", ...]. */
