@@ -899,6 +899,11 @@ export default {
       const { paidConfig } = await import("./paycfg.js");
       return json(storeCatalog(url.origin, paidConfig(env)));
     }
+    if (url.pathname === "/health/payments") {
+      const { paymentsReady } = await import("./paid.js");
+      const r = await paymentsReady(env);
+      return json(r, r.ready ? 200 : 503);
+    }
     if (url.pathname === "/rescue/preview") {
       if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"text": "<Apple\'s rejection message>"} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
       const { parseInput, withReceipt } = await import("./rescue.js");

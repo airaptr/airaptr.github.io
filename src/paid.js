@@ -87,6 +87,32 @@ function methodNotAllowed(request, url, log, cors) {
 }
 
 // produce(): returns the JSON body for a paid call. log(event): usage counter (no payment details).
+// Can we actually get paid? Asks the configured facilitator (with our key, for real money) what it supports, and says
+// whether it settles our scheme on our network. Free; never shows the key; cached for 5 minutes.
+let readyCache = null;
+export async function paymentsReady(env = {}) {
+  if (readyCache && Date.now() - readyCache.at < 300000) return readyCache.result;
+  const cfg = paidConfig(env);
+  const get = (k) => env[k] || globalThis.process?.env?.[k];
+  let result;
+  try {
+    if (!cfg.payTo) throw new Error("no receiving address set");
+    if (cfg.network === "eip155:8453" && !cfg.cdp) throw new Error("real money needs the facilitator key");
+    const fac = cfg.cdp
+      ? (await import("@coinbase/x402")).createFacilitatorConfig(get("CDP_API_KEY_ID"), get("CDP_API_KEY_SECRET"))
+      : { url: cfg.facilitator };
+    const supported = await new HTTPFacilitatorClient(fac).getSupported();
+    const kinds = (supported.kinds || []).map((k) => `${k.scheme}@${k.network}`);
+    const ok = kinds.includes(`exact@${cfg.network}`);
+    result = { ready: ok, network: cfg.network, real_money: cfg.network === "eip155:8453", pay_to: cfg.payTo,
+               facilitator_supports_us: ok, ...(ok ? {} : { detail: `facilitator offers: ${kinds.slice(0, 12).join(", ")}` }) };
+  } catch (e) {
+    result = { ready: false, network: cfg.network, real_money: cfg.network === "eip155:8453", detail: String(e.message || e).slice(0, 200) };
+  }
+  readyCache = { at: Date.now(), result };
+  return result;
+}
+
 export async function handlePaid(request, env, produce, log = () => {}, cors = {}) {
   const url = new URL(request.url);
   const cfg = paidConfig(env);
