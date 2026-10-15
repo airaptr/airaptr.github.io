@@ -257,6 +257,21 @@ const TOOLS = [
     annotations: READ_ONLY,
   },
   {
+    name: "rejection_rescue_preview",
+    title: "Explain an App Store rejection",
+    description:
+      "Use when the user pastes a rejection message from Apple App Review (it cites guidelines such as \"Guideline 5.1.1(i)\"). Free. " +
+      "Returns each cited guideline section it recognizes, with its title and what Apple means by it, and lists sections it does not know. " +
+      "The full version (likely causes, a fix list and a reply draft to App Review) is a separate paid HTTP call; the result says its price and route.",
+    inputSchema: {
+      type: "object",
+      properties: { text: { type: "string", maxLength: 20480, description: "Apple's rejection message, as received (up to 20 KB)" } },
+      required: ["text"],
+      additionalProperties: false,
+    },
+    annotations: READ_ONLY,
+  },
+  {
     name: "request_service",
     title: "Ask us to build something",
     description:
@@ -275,12 +290,13 @@ const TOOLS = [
 // Each ChatGPT listing is the same server with its own set of tools.
 const PROFILES = {
   builder: {
-    server: { name: "agent-builder", version: "1.2.0" },
-    tools: ["get_agent_template", "check_agent", "use_agent_here", "find_agents", "get_agent_code", "share_agent", "how_to_run_agent", "request_service"],
+    server: { name: "agent-builder", version: "1.3.0" },
+    tools: ["get_agent_template", "check_agent", "use_agent_here", "find_agents", "get_agent_code", "share_agent", "how_to_run_agent", "rejection_rescue_preview", "request_service"],
     instructions:
       "Build single-file AI agents people can use immediately: get_agent_template, write the agent, check_agent until it passes, then use_agent_here " +
       "to run it in this chat on the user's own data. Always give the user the complete agent file after check_agent passes. Nothing to install. Use find_agents to reuse existing ones. how_to_run_agent is only for keeping " +
-      "an agent on their own computer later. share_agent only when the user asks to share.",
+      "an agent on their own computer later. share_agent only when the user asks to share. " +
+      "rejection_rescue_preview explains an App Store rejection message (free).",
   },
   finder: {
     server: { name: "agent-finder", version: "1.0.0" },
@@ -612,8 +628,30 @@ async function fingerprintText({ text, expected }) {
   return { text: line, structured: out };
 }
 
+// Rejection Rescue preview (free): the MCP tool, the A2A skill and POST /rescue/preview all answer with this.
+async function rescuePreview(text) {
+  const { preview, withReceipt, MAX_INPUT_BYTES } = await import("./rescue.js");
+  const { rescueOffer } = await import("./store.js");
+  const { paidConfig } = await import("./paycfg.js");
+  const t = typeof text === "string" ? text : "";
+  if (!t.trim()) return { text: "Paste Apple's rejection message (the text that cites guidelines such as \"Guideline 2.1\").", structured: { error: "empty input" }, isError: true };
+  const size = new TextEncoder().encode(t).length;
+  if (size > MAX_INPUT_BYTES) return { text: `That is ${size} bytes; the limit is ${MAX_INPUT_BYTES} (20 KB). Send only Apple's rejection message.`, structured: { error: "input too large" }, isError: true };
+  const cfg = paidConfig(activeEnv);
+  const p = await withReceipt(preview(t, rescueOffer(activeOrigin, cfg)));
+  const lines = p.recognized.map((r) => `${r.section} ${r.title}: ${r.means}`);
+  let out = p.sections.length ? `Apple cited: ${p.sections.join(", ")}\n\n${lines.join("\n")}` : "No guideline numbers found in this text (Apple writes them as \"Guideline 5.1.1(i)\").";
+  if (p.unknown_sections.length) out += `\n\nNot in the playbook, so not explained (read Apple's text for these): ${p.unknown_sections.join(", ")}`;
+  if (p.full_version.available) {
+    const asked = p.apple_asked_count ? `, a reply draft answering Apple's ${p.apple_asked_count} questions` : ", a reply draft";
+    out += `\n\nThe full version (likely causes, a fix list${asked}) is a paid call: ${p.full_version.route}, ${p.full_version.price} USDC on ${p.full_version.network} over x402.`;
+  }
+  return { text: out, structured: p };
+}
+
 let currentListing = "";
 let activeEnv = {};
+let activeOrigin = "https://airaptr-api.azurewebsites.net";
 async function callTool(name, args) {
   switch (name) {
     case "get_agent_template": return getTemplate();
@@ -638,6 +676,7 @@ async function callTool(name, args) {
     case "content_seeds": return (await import("./kit.js")).contentSeeds(args);
     case "setup_checklist": return (await import("./kit.js")).setupChecklist(args);
     case "fingerprint_text": return fingerprintText(args);
+    case "rejection_rescue_preview": return rescuePreview(args.text);
     case "request_service": return (await import("./signals.js")).recordRequest(activeEnv, { request: args.request, listing: currentListing });
     case "check_names": return (await import("./domains.js")).checkNames(args);
     case "check_domain": return (await import("./domains.js")).checkDomains(args);
@@ -695,7 +734,7 @@ function llmsTxt(origin) {
 
 ## MCP servers (streamable HTTP, no auth)
 
-- [Agent Builder](${origin}/mcp): get_agent_template, check_agent, use_agent_here, find_agents, get_agent_code, share_agent, how_to_run_agent
+- [Agent Builder](${origin}/mcp): get_agent_template, check_agent, use_agent_here, find_agents, get_agent_code, share_agent, how_to_run_agent, rejection_rescue_preview
 - [Agent Finder](${origin}/finder/mcp): find_agents, get_agent_code, use_agent_here, how_to_run_agent
 - [World Check](${origin}/world/mcp): world_now, fingerprint_text
 - [Domain Check](${origin}/domains/mcp): check_domain, register_domain
@@ -705,9 +744,17 @@ function llmsTxt(origin) {
 - GET ${origin}/x402/world: fresh verified world snapshot, $0.001
 - POST ${origin}/x402/domains/register?domain=NAME: register an available domain; the 402 response quotes the price; charged only if registration succeeds (raise your x402 client's default $1 per-payment cap first)
 
+## Store
+
+- [Catalog](${origin}/store.json): every product with its free part, paid part, price, network, exact calls, a sample input and output, and terms. Charged only when the paid output is delivered.
+- Rejection Rescue, free preview: POST ${origin}/rescue/preview with {"text": "<Apple's rejection message>"}, or the MCP tool rejection_rescue_preview on ${origin}/mcp. Returns the guideline sections it recognizes and what Apple means by each.
+- Rejection Rescue, full (paid): POST ${origin}/x402/rescue with {"text": "...", "changes": "optional", "recording_url": "optional"}: likely causes, a fix list and a reply draft to App Review. Price and network are in the 402 response and in store.json. Input up to 20 KB; empty, invalid or unrecognized input is refused before payment.
+- Every Rejection Rescue response carries sha256, a receipt of its own body (canonical JSON).
+- Coming soon: rapple-sim (free iOS Simulator MCP server), and a "Will it pass?" App Store listing check.
+
 ## A2A
 
-- [Agent card](${origin}/.well-known/agent-card.json): JSON-RPC message/send at ${origin}/a2a. Skills: find_agents, world_now, agent_template.
+- [Agent card](${origin}/.well-known/agent-card.json): JSON-RPC message/send at ${origin}/a2a. Skills: find_agents, world_now, agent_template, rejection_rescue_preview.
 
 ## Docs
 
@@ -731,6 +778,7 @@ function mcpWellKnown(origin) {
     })),
     website: SITE,
     llms_txt: `${origin}/llms.txt`,
+    store: `${origin}/store.json`,
   };
 }
 
@@ -738,12 +786,13 @@ const A2A_SKILLS = [
   { id: "find_agents", name: "Find agents", description: "Search the open agent registry (about 1,700 single-file agents) for agents that do a task. Send the task in plain words.", tags: ["agents", "registry", "search"], examples: ["agents that summarize sales calls", "invoice processing"] },
   { id: "world_now", name: "World now", description: "Verified snapshot of world numbers right now (Bitcoin, FX, earthquakes, space weather, ISS) with the public world tick, time and SHA-256 fingerprint.", tags: ["world-data", "verification"], examples: ["what is happening in the world right now"] },
   { id: "agent_template", name: "Agent template", description: "The official single-file agent template and its rules, so the calling agent can write a new agent.", tags: ["agents", "template"], examples: ["give me the agent template"] },
+  { id: "rejection_rescue_preview", name: "Rejection Rescue preview", description: "Free: send Apple's App Review rejection message; get each cited guideline section it recognizes, with its title and what Apple means. The full diagnosis and reply draft is a paid HTTP call (see /store.json).", tags: ["app-store", "app-review", "rejection"], examples: ["Guideline 5.1.1(i) - Legal - Privacy - Data Collection and Storage ..."] },
 ];
 
 function agentCard(origin) {
   return {
     name: "Raptr",
-    description: "AI agents anyone can use: find ready-made agents, get the template to build one, and get verified world numbers. Read-only, no auth, nothing stored.",
+    description: "AI agents anyone can use: find ready-made agents, get the template to build one, get verified world numbers, and get an App Store rejection explained (free preview; the full rescue is paid per call, see /store.json). No auth, nothing stored.",
     // A2A 1.0 lists endpoints here; the 0.3 fields below keep older clients working on the same endpoint.
     supportedInterfaces: [
       { url: `${origin}/a2a`, protocolBinding: "JSONRPC", protocolVersion: "1.0", tenant: "" },
@@ -769,6 +818,7 @@ function agentCard(origin) {
 export function pickSkill(text, meta = {}) {
   if (meta && A2A_SKILLS.some((k) => k.id === meta.skill)) return meta.skill;
   const t = (text || "").toLowerCase();
+  if (/\bguideline\s+\d/.test(t)) return "rejection_rescue_preview";
   if (/\b(world|right now|bitcoin|btc|exchange rate|earthquake|space weather|iss|fingerprint)\b/.test(t)) return "world_now";
   if (/\btemplate\b/.test(t)) return "agent_template";
   return "find_agents";
@@ -785,6 +835,7 @@ async function handleA2A(msg) {
   let r;
   if (skill === "world_now") r = await worldNow();
   else if (skill === "agent_template") r = getTemplate();
+  else if (skill === "rejection_rescue_preview") r = await rescuePreview(text);
   else r = await findAgents({ query: text, limit: 5 });
   usage({ server: { name: "agent-a2a" } }, skill, !r.isError);
   const contextId = m.contextId || crypto.randomUUID();
@@ -834,6 +885,7 @@ export default {
   async fetch(request, env = {}) {
     activeEnv = env;
     const url = new URL(request.url);
+    activeOrigin = url.origin;
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     // OpenAI domain verification: serve exactly the token the plugin portal issues.
     if (url.pathname === "/.well-known/openai-apps-challenge") {
@@ -842,10 +894,36 @@ export default {
         ? new Response(token.trim(), { headers: { "Content-Type": "text/plain" } })
         : new Response("not configured", { status: 404 });
     }
+    if (url.pathname === "/store.json") {
+      const { storeCatalog } = await import("./store.js");
+      const { paidConfig } = await import("./paycfg.js");
+      return json(storeCatalog(url.origin, paidConfig(env)));
+    }
+    if (url.pathname === "/rescue/preview") {
+      if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"text": "<Apple\'s rejection message>"} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
+      const { parseInput, withReceipt } = await import("./rescue.js");
+      const parsed = parseInput(await request.text(), request.headers.get("content-type") || "");
+      if (parsed.error) return json(await withReceipt({ error: parsed.error }), parsed.status);
+      const r = await rescuePreview(parsed.input.text);
+      return json(r.structured, r.isError ? 400 : 200);
+    }
     if (url.pathname.startsWith(PAID_PREFIX)) {
       const { handlePaid, PAID_ROUTES } = await import("./paid.js");
       if (!PAID_ROUTES.includes(url.pathname)) return json({ error: "not found" }, 404);
-      const produce = url.pathname === "/x402/domains/register"
+      let produce;
+      if (url.pathname === "/x402/rescue") {
+        // Everything that can be refused is refused here, before any payment is asked for or taken.
+        if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"text": "<Apple\'s rejection message>"} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
+        const { parseInput, withReceipt, rescue, preview } = await import("./rescue.js");
+        const parsed = parseInput(await request.text(), request.headers.get("content-type") || "");
+        if (parsed.error) return json(await withReceipt({ error: parsed.error, charged: false }), parsed.status);
+        const { text, changes, recording_url } = parsed.input;
+        const p = preview(text);
+        if (!p.recognized.length) {
+          return json(await withReceipt({ error: "No guideline section in this text is in the playbook, so there is nothing to diagnose. Not charged.", charged: false, sections: p.sections, unknown_sections: p.unknown_sections }), 422);
+        }
+        produce = async () => withReceipt({ product: "rejection-rescue", ...rescue(text, { changes, recording_url }) });
+      } else produce = url.pathname === "/x402/domains/register"
         ? async () => {
             const { orderQuote, registerAtPorkbun } = await import("./domains.js");
             const q = await orderQuote(url.searchParams.get("domain"), env);

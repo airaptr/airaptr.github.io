@@ -6,25 +6,21 @@
 //   X402_NETWORK      CAIP-2 network, default eip155:84532 (Base Sepolia testnet); eip155:8453 = Base mainnet
 //   X402_FACILITATOR  facilitator URL, default https://x402.org/facilitator (testnet)
 //   X402_PRICE        price per call, default $0.001
+//   X402_PRICE_RESCUE price of the full Rejection Rescue, default $0.50
 
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { x402HTTPResourceServer } from "@x402/core/http";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { orderQuote, fulfilmentReady } from "./domains.js";
+import { paidConfig } from "./paycfg.js";
 
-export const PAID_ROUTES = ["/x402/world", "/x402/domains/register"];
+export { paidConfig };
+
+export const PAID_ROUTES = ["/x402/world", "/x402/domains/register", "/x402/rescue"];
+const SERVICE = { "/x402/world": "dogg-world-check", "/x402/domains/register": "raptr-domains", "/x402/rescue": "rejection-rescue" };
+const METHOD = { "/x402/world": "GET", "/x402/domains/register": "POST", "/x402/rescue": "POST" };
 
 let cached = null;
-
-export function paidConfig(env = {}) {
-  const get = (k) => env[k] || globalThis.process?.env?.[k];
-  return {
-    payTo: get("X402_PAY_TO"),
-    network: get("X402_NETWORK") || "eip155:84532",
-    facilitator: get("X402_FACILITATOR") || "https://x402.org/facilitator",
-    price: get("X402_PRICE") || "$0.001",
-  };
-}
 
 async function server(cfg, env = {}) {
   const key = JSON.stringify(cfg);
@@ -45,6 +41,11 @@ async function server(cfg, env = {}) {
         price: async (ctx) => `$${(await orderQuote(ctx.adapter.getQueryParam?.("domain"), env)).price_usd}`,
       },
       description: "Raptr Domains: register an available domain name. Charged only if registration succeeds.",
+      mimeType: "application/json",
+    },
+    "POST /x402/rescue": {
+      accepts: { scheme: "exact", network: cfg.network, payTo: cfg.payTo, price: cfg.priceRescue },
+      description: "Rejection Rescue: the full diagnosis, fix list and App Review reply draft for an Apple rejection message. Charged only when the output is delivered.",
       mimeType: "application/json",
     },
   });
@@ -73,6 +74,11 @@ function toResponse(instr, extra = {}) {
   });
 }
 
+function methodNotAllowed(request, url, log, cors) {
+  log({ route: url.pathname, outcome: "method_not_allowed" });
+  return new Response(JSON.stringify({ error: `${request.method} is not allowed here; use ${METHOD[url.pathname]}.` }), { status: 405, headers: { "Content-Type": "application/json", Allow: METHOD[url.pathname] || "", ...cors } });
+}
+
 // produce(): returns the JSON body for a paid call. log(event): usage counter (no payment details).
 export async function handlePaid(request, env, produce, log = () => {}, cors = {}) {
   const url = new URL(request.url);
@@ -80,6 +86,7 @@ export async function handlePaid(request, env, produce, log = () => {}, cors = {
   if (!cfg.payTo) {
     return new Response(JSON.stringify({ error: "Paid access is not switched on yet." }), { status: 503, headers: { "Content-Type": "application/json", ...cors } });
   }
+  if (request.method !== METHOD[url.pathname]) return methodNotAllowed(request, url, log, cors);
   if (url.pathname === "/x402/domains/register") {
     if (!fulfilmentReady(env)) {
       return new Response(JSON.stringify({ error: "Domain registration is not switched on yet." }), { status: 503, headers: { "Content-Type": "application/json", ...cors } });
@@ -100,9 +107,9 @@ export async function handlePaid(request, env, produce, log = () => {}, cors = {
     log({ route: url.pathname, outcome: "payment_required" });
     return toResponse(result.response, cors);
   }
-  if (result.type === "no-payment-required") {
-    return new Response(JSON.stringify(await produce()), { headers: { "Content-Type": "application/json", ...cors } });
-  }
+  // Every paid route is in the route table, so "no payment required" only means the method didn't match it
+  // (e.g. GET on a POST route). Never produce paid output on that path.
+  if (result.type === "no-payment-required") return methodNotAllowed(request, url, log, cors);
 
   // Payment verified: do the work, then settle. Only settle once the work succeeded.
   let body;
@@ -110,7 +117,7 @@ export async function handlePaid(request, env, produce, log = () => {}, cors = {
     body = await produce();
   } catch (e) {
     log({ route: url.pathname, outcome: "work_failed" });
-    return new Response(JSON.stringify({ error: `Could not produce the snapshot: ${e.message}. You were not charged.` }), { status: 502, headers: { "Content-Type": "application/json", ...cors } });
+    return new Response(JSON.stringify({ error: `Could not produce the result: ${e.message}. You were not charged.` }), { status: 502, headers: { "Content-Type": "application/json", ...cors } });
   }
   const settled = await http.processSettlement(result.paymentPayload, result.paymentRequirements, result.declaredExtensions);
   if (!settled.success) {
@@ -123,7 +130,7 @@ export async function handlePaid(request, env, produce, log = () => {}, cors = {
     // The ledger ships privately (estate repo); public builds simply skip it.
     const { appendReceipt } = await import("./ledger.js").catch(() => ({ appendReceipt: async () => {} }));
     await appendReceipt(env, {
-      service: url.pathname === "/x402/world" ? "dogg-world-check" : "raptr-domains",
+      service: SERVICE[url.pathname],
       route: url.pathname,
       amount: result.paymentRequirements.amount,
       asset: result.paymentRequirements.asset,

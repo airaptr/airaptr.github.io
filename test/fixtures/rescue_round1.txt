@@ -1,0 +1,8 @@
+Guideline 2.1 - Information Needed
+
+We need more information to continue the review. Please provide:
+1. A screen recording captured on a physical device that starts at app launch and shows the main flow.
+2. What is the purpose of your app and who is the target audience?
+3. Instructions to set up the main features, including any credentials.
+4. Which external services, tools or platforms does your app use for its core features?
+5. Are there regional differences in how your app works?

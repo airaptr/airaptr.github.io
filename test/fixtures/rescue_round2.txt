@@ -1,0 +1,9 @@
+Guideline 5.1.1(i) - Legal - Privacy - Data Collection and Storage
+Guideline 5.1.2(i) - Legal - Privacy - Data Use and Sharing
+
+The app appears to share the user's personal data with a third-party AI service but the app does not clearly explain
+what data is sent, identify who the data is sent to and ask the user's permission before sharing.
+
+Guideline 5.2.5 - Legal - Intellectual Property
+
+Your app's metadata includes Apple product names in a way that may be confusing.

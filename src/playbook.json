@@ -1,0 +1,109 @@
+{
+  "_about": "Rejection Rescue playbook: what Apple means by each common rejection, what usually causes it, what to check in the app, how to fix it, and what to say back. Sections are written the way Apple writes them in the App Review Guidelines. Grows from every real rejection the factory sees (Phase 8).",
+  "sections": {
+    "2.1": {
+      "title": "App Completeness (often 'Information Needed')",
+      "means": "The reviewer couldn't fully review the app, or needs more information before they can.",
+      "causes": ["a crash or a broken flow on the reviewer's device (often an iPad)", "features behind a login with no demo account", "missing answers about purpose, audience, setup, outside services or regions", "no screen recording on a real device for a new developer account", "in-app purchases not submitted with the app"],
+      "checks": ["store gate G1 (review notes answer Apple's headings)", "store gate G3 (real-device recording linked)", "rapple-review behavior: cold launch, no crash, iPad launch", "store gate A3/A4 (sample data, self-playing tour)"],
+      "fix": ["Answer every question Apple asked, under its own heading, in the reply and in App Review Information > Notes", "Record the tour on a real phone (one tap) and link it", "Make sure sample data reaches every screen with nothing set up", "Retest on an iPad simulator"],
+      "reply": "Thank you for the review. We've answered each of your questions below and added the same information to the App Review notes.\n\n{answers}\n\nA screen recording on a physical device, from launch through the full flow: {recording_url}"
+    },
+    "2.3": {
+      "title": "Accurate Metadata",
+      "means": "Something in the listing doesn't match the app, or hides what the app does.",
+      "causes": ["description promises a feature the build doesn't have", "screenshots or preview show something the app can't do", "keywords stuffed with unrelated terms or competitor names"],
+      "checks": ["store gate D checks", "screenshots come from the UI test run of this build"],
+      "fix": ["Remove or reword every claim the current build can't show", "Regenerate screenshots from this exact build"],
+      "reply": "Thank you. We've updated the description and screenshots so they show only what this version does: {changes}"
+    },
+    "2.3.3": {
+      "title": "Screenshots must show the app in use",
+      "means": "Screenshots can't be only title art, a login screen or a splash screen.",
+      "causes": ["marketing art instead of real screens", "a splash or login screen as a screenshot"],
+      "checks": ["store gate A1 (sizes)", "a human look at every screenshot"],
+      "fix": ["Use real screens from the UI test's screenshot run, with at most a short caption above each"],
+      "reply": "Thank you. We've replaced the screenshots with screens of the app in use: {changes}"
+    },
+    "2.3.10": {
+      "title": "Don't mention other platforms",
+      "means": "The listing or app names another platform (Android, Google Play) or uses unrelated content.",
+      "causes": ["'Also on Android' in the description", "Android or Play references left in app text"],
+      "checks": ["rapple-review static: other platforms named in UI or metadata"],
+      "fix": ["Remove every reference to other platforms from the listing, screenshots and app text"],
+      "reply": "Thank you. We've removed references to other platforms from the app and its listing."
+    },
+    "2.5.4": {
+      "title": "Background services only for their intended purpose",
+      "means": "A declared background mode isn't used for what it's meant for.",
+      "causes": ["UIBackgroundModes left on from a template", "background audio or location used to keep the app alive"],
+      "checks": ["rapple-review static: background modes declared but unused"],
+      "fix": ["Remove every background mode the app doesn't need, or explain the feature that needs it in the review notes"],
+      "reply": "Thank you. We've removed the background mode{s} the app doesn't use: {changes}"
+    },
+    "3.1.1": {
+      "title": "In-App Purchase",
+      "means": "Digital content or features must be unlocked with Apple's in-app purchase, and the purchases must be submitted with the app.",
+      "causes": ["a link or button to pay on a website for digital content", "a third-party payment SDK used for digital unlocks", "IAP products not attached to the submission"],
+      "checks": ["rapple-review static: payment steering", "app-store-ops readiness (IAP attached)"],
+      "fix": ["Route every digital unlock through StoreKit", "Remove outside-payment links for digital goods", "Attach the in-app purchases to the version before resubmitting"],
+      "reply": "Thank you. Digital features are now unlocked only through in-app purchase, and the purchases are submitted with this version: {changes}"
+    },
+    "3.1.2": {
+      "title": "Subscriptions",
+      "means": "The subscription screen or listing is missing required information or doesn't deliver ongoing value.",
+      "causes": ["price, duration or what's included not clear before purchase", "no links to Terms of Use (EULA) and the privacy policy", "no restore purchases", "free-trial terms unclear"],
+      "checks": ["store gate D10 (EULA link)", "paywall screenshot review"],
+      "fix": ["Show price, period and what's included before the buy button", "Add Terms of Use and privacy policy links on the paywall and in the description", "Add Restore Purchases"],
+      "reply": "Thank you. The subscription screen now shows the price, period and what's included before purchase, with links to the Terms of Use and privacy policy, and a Restore Purchases button: {changes}"
+    },
+    "4.2": {
+      "title": "Minimum Functionality",
+      "means": "The app is too limited, or is mainly a website wrapped in an app.",
+      "causes": ["one screen or a single feature", "a web view showing a website", "content better suited to a website"],
+      "checks": ["rapple-review static: minimum-functionality signals"],
+      "fix": ["Explain in the reply what the app does that a website can't (on-device features, offline, notifications, camera)", "If it's thin, add the core feature that makes it worth installing before resubmitting"],
+      "reply": "Thank you. To clarify what the app does on the device: {answers}\n\nWe've also {changes}"
+    },
+    "4.3": {
+      "title": "Spam",
+      "means": "The app looks too similar to other apps, including our own, or to a saturated category.",
+      "causes": ["several apps from one account that share screens or templates", "a category with many near-identical apps"],
+      "checks": ["idea card 1: the 4.3 check"],
+      "fix": ["Show what's different in function, not looks; consider combining similar apps into one"],
+      "reply": "Thank you. This app differs from others in the category in what it does: {answers}"
+    },
+    "4.8": {
+      "title": "Login Services",
+      "means": "An app that offers third-party or social login must also offer an equivalent privacy-focused login option.",
+      "causes": ["Google or Facebook login without an equivalent option"],
+      "checks": ["rapple-review static: accounts"],
+      "fix": ["Add Sign in with Apple, or another login that meets 4.8's requirements"],
+      "reply": "Thank you. We've added a login option that meets Guideline 4.8: {changes}"
+    },
+    "5.1.1": {
+      "title": "Data Collection and Storage",
+      "means": "Data handling isn't clear, consented or necessary, or a permission's purpose text is missing or vague, or account deletion is missing.",
+      "causes": ["a permission requested at launch instead of in context", "vague purpose strings ('We need access')", "personal data sent somewhere without saying what, to whom, and asking first", "accounts with no in-app deletion (5.1.1(v))", "privacy policy that doesn't cover what the app actually does"],
+      "checks": ["rapple-review static: purpose strings, privacy manifest, SDKs vs App Privacy answer, accounts", "rapple-review behavior: no permission prompt at launch", "store gate C1 (privacy policy page)"],
+      "fix": ["Ask for each permission only when the person uses the feature that needs it, with a plain purpose string", "Before any personal data leaves the phone, say what is sent and to whom, and ask (Allow / Not now)", "Add in-app account deletion if there are accounts", "Make the privacy policy match the app"],
+      "reply": "Thank you. Before any personal data leaves the device, the app now shows what will be sent and to whom, and asks for permission first. The privacy policy says the same: {changes}\n\nA recording of this on a physical device: {recording_url}"
+    },
+    "5.1.2": {
+      "title": "Data Use and Sharing",
+      "means": "Personal data is shared with a third party (including an AI service) without clear disclosure and permission.",
+      "causes": ["messages or files sent to an AI provider without asking first", "analytics or ads SDKs sharing data the App Privacy answer doesn't declare"],
+      "checks": ["rapple-review static: outside-service endpoints and SDKs vs App Privacy"],
+      "fix": ["Name the service that receives the data, say what is sent, and ask before the first send", "Make the App Privacy answers match every SDK"],
+      "reply": "Thank you. The app now names the service that receives the data, says what is sent, and asks before the first send. The App Privacy answers match: {changes}"
+    },
+    "5.2.5": {
+      "title": "Apple Products",
+      "means": "Apple's product names are used in a way that's confusing or not allowed.",
+      "causes": ["'iPhone', 'iPad', 'Siri' or 'Apple Intelligence' in the name or subtitle", "Apple product images in screenshots"],
+      "checks": ["store gate D2"],
+      "fix": ["Remove Apple product names from the name, subtitle and keywords; keep them only where describing compatibility in the description is allowed"],
+      "reply": "Thank you. We've removed Apple product names from the app's name, subtitle and keywords: {changes}"
+    }
+  }
+}

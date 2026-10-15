@@ -1,0 +1,230 @@
+{
+ "_about": "Golden output of rapple-factory/rescue/rescue.py (no --app) for the two real Rapp Hive rejections; reply_missing without nulls. Regenerate if the playbook changes.",
+ "changes": "Added an Allow / Not now consent screen before the first message is sent.",
+ "cases": {
+  "round1": {
+   "sections": [
+    "2.1"
+   ],
+   "items": [
+    {
+     "section": "2.1",
+     "playbook": "2.1",
+     "title": "App Completeness (often 'Information Needed')",
+     "means": "The reviewer couldn't fully review the app, or needs more information before they can.",
+     "likely_causes": [
+      "a crash or a broken flow on the reviewer's device (often an iPad)",
+      "features behind a login with no demo account",
+      "missing answers about purpose, audience, setup, outside services or regions",
+      "no screen recording on a real device for a new developer account",
+      "in-app purchases not submitted with the app"
+     ],
+     "check": [
+      "store gate G1 (review notes answer Apple's headings)",
+      "store gate G3 (real-device recording linked)",
+      "rapple-review behavior: cold launch, no crash, iPad launch",
+      "store gate A3/A4 (sample data, self-playing tour)"
+     ],
+     "evidence": [],
+     "fix": [
+      "Answer every question Apple asked, under its own heading, in the reply and in App Review Information > Notes",
+      "Record the tour on a real phone (one tap) and link it",
+      "Make sure sample data reaches every screen with nothing set up",
+      "Retest on an iPad simulator"
+     ]
+    }
+   ],
+   "unknown_sections": [],
+   "apple_asked": [
+    "A screen recording captured on a physical device that starts at app launch and shows the main flow.",
+    "What is the purpose of your app and who is the target audience?",
+    "Instructions to set up the main features, including any credentials.",
+    "Which external services, tools or platforms does your app use for its core features?",
+    "Are there regional differences in how your app works?"
+   ],
+   "cards": [
+    "[2.1] Answer every question Apple asked, under its own heading, in the reply and in App Review Information > Notes",
+    "[2.1] Record the tour on a real phone (one tap) and link it",
+    "[2.1] Make sure sample data reaches every screen with nothing set up",
+    "[2.1] Retest on an iPad simulator"
+   ],
+   "reply_draft": "Thank you for the review. We've answered each of your questions below and added the same information to the App Review notes.\n\n1. A screen recording captured on a physical device that starts at app launch and shows the main flow.\n   → [answer]\n2. What is the purpose of your app and who is the target audience?\n   → [answer]\n3. Instructions to set up the main features, including any credentials.\n   → [answer]\n4. Which external services, tools or platforms does your app use for its core features?\n   → [answer]\n5. Are there regional differences in how your app works?\n   → [answer]\n\nA screen recording on a physical device, from launch through the full flow: [link the real-device recording]",
+   "reply_ready": false,
+   "reply_missing": [
+    "answers to Apple's questions",
+    "the recording link"
+   ]
+  },
+  "round2": {
+   "sections": [
+    "5.1.1(i)",
+    "5.1.2(i)",
+    "5.2.5"
+   ],
+   "items": [
+    {
+     "section": "5.1.1(i)",
+     "playbook": "5.1.1",
+     "title": "Data Collection and Storage",
+     "means": "Data handling isn't clear, consented or necessary, or a permission's purpose text is missing or vague, or account deletion is missing.",
+     "likely_causes": [
+      "a permission requested at launch instead of in context",
+      "vague purpose strings ('We need access')",
+      "personal data sent somewhere without saying what, to whom, and asking first",
+      "accounts with no in-app deletion (5.1.1(v))",
+      "privacy policy that doesn't cover what the app actually does"
+     ],
+     "check": [
+      "rapple-review static: purpose strings, privacy manifest, SDKs vs App Privacy answer, accounts",
+      "rapple-review behavior: no permission prompt at launch",
+      "store gate C1 (privacy policy page)"
+     ],
+     "evidence": [],
+     "fix": [
+      "Ask for each permission only when the person uses the feature that needs it, with a plain purpose string",
+      "Before any personal data leaves the phone, say what is sent and to whom, and ask (Allow / Not now)",
+      "Add in-app account deletion if there are accounts",
+      "Make the privacy policy match the app"
+     ]
+    },
+    {
+     "section": "5.1.2(i)",
+     "playbook": "5.1.2",
+     "title": "Data Use and Sharing",
+     "means": "Personal data is shared with a third party (including an AI service) without clear disclosure and permission.",
+     "likely_causes": [
+      "messages or files sent to an AI provider without asking first",
+      "analytics or ads SDKs sharing data the App Privacy answer doesn't declare"
+     ],
+     "check": [
+      "rapple-review static: outside-service endpoints and SDKs vs App Privacy"
+     ],
+     "evidence": [],
+     "fix": [
+      "Name the service that receives the data, say what is sent, and ask before the first send",
+      "Make the App Privacy answers match every SDK"
+     ]
+    },
+    {
+     "section": "5.2.5",
+     "playbook": "5.2.5",
+     "title": "Apple Products",
+     "means": "Apple's product names are used in a way that's confusing or not allowed.",
+     "likely_causes": [
+      "'iPhone', 'iPad', 'Siri' or 'Apple Intelligence' in the name or subtitle",
+      "Apple product images in screenshots"
+     ],
+     "check": [
+      "store gate D2"
+     ],
+     "evidence": [],
+     "fix": [
+      "Remove Apple product names from the name, subtitle and keywords; keep them only where describing compatibility in the description is allowed"
+     ]
+    }
+   ],
+   "unknown_sections": [],
+   "apple_asked": [],
+   "cards": [
+    "[5.1.1(i)] Ask for each permission only when the person uses the feature that needs it, with a plain purpose string",
+    "[5.1.1(i)] Before any personal data leaves the phone, say what is sent and to whom, and ask (Allow / Not now)",
+    "[5.1.1(i)] Add in-app account deletion if there are accounts",
+    "[5.1.1(i)] Make the privacy policy match the app",
+    "[5.1.2(i)] Name the service that receives the data, say what is sent, and ask before the first send",
+    "[5.1.2(i)] Make the App Privacy answers match every SDK",
+    "[5.2.5] Remove Apple product names from the name, subtitle and keywords; keep them only where describing compatibility in the description is allowed"
+   ],
+   "reply_draft": "Thank you. Before any personal data leaves the device, the app now shows what will be sent and to whom, and asks for permission first. The privacy policy says the same: [list exactly what changed]\n\nA recording of this on a physical device: [link the real-device recording]\n\nThank you. The app now names the service that receives the data, says what is sent, and asks before the first send. The App Privacy answers match: [list exactly what changed]\n\nThank you. We've removed Apple product names from the app's name, subtitle and keywords: [list exactly what changed]",
+   "reply_ready": false,
+   "reply_missing": [
+    "the list of changes",
+    "the recording link"
+   ]
+  },
+  "round2_changes": {
+   "sections": [
+    "5.1.1(i)",
+    "5.1.2(i)",
+    "5.2.5"
+   ],
+   "items": [
+    {
+     "section": "5.1.1(i)",
+     "playbook": "5.1.1",
+     "title": "Data Collection and Storage",
+     "means": "Data handling isn't clear, consented or necessary, or a permission's purpose text is missing or vague, or account deletion is missing.",
+     "likely_causes": [
+      "a permission requested at launch instead of in context",
+      "vague purpose strings ('We need access')",
+      "personal data sent somewhere without saying what, to whom, and asking first",
+      "accounts with no in-app deletion (5.1.1(v))",
+      "privacy policy that doesn't cover what the app actually does"
+     ],
+     "check": [
+      "rapple-review static: purpose strings, privacy manifest, SDKs vs App Privacy answer, accounts",
+      "rapple-review behavior: no permission prompt at launch",
+      "store gate C1 (privacy policy page)"
+     ],
+     "evidence": [],
+     "fix": [
+      "Ask for each permission only when the person uses the feature that needs it, with a plain purpose string",
+      "Before any personal data leaves the phone, say what is sent and to whom, and ask (Allow / Not now)",
+      "Add in-app account deletion if there are accounts",
+      "Make the privacy policy match the app"
+     ]
+    },
+    {
+     "section": "5.1.2(i)",
+     "playbook": "5.1.2",
+     "title": "Data Use and Sharing",
+     "means": "Personal data is shared with a third party (including an AI service) without clear disclosure and permission.",
+     "likely_causes": [
+      "messages or files sent to an AI provider without asking first",
+      "analytics or ads SDKs sharing data the App Privacy answer doesn't declare"
+     ],
+     "check": [
+      "rapple-review static: outside-service endpoints and SDKs vs App Privacy"
+     ],
+     "evidence": [],
+     "fix": [
+      "Name the service that receives the data, say what is sent, and ask before the first send",
+      "Make the App Privacy answers match every SDK"
+     ]
+    },
+    {
+     "section": "5.2.5",
+     "playbook": "5.2.5",
+     "title": "Apple Products",
+     "means": "Apple's product names are used in a way that's confusing or not allowed.",
+     "likely_causes": [
+      "'iPhone', 'iPad', 'Siri' or 'Apple Intelligence' in the name or subtitle",
+      "Apple product images in screenshots"
+     ],
+     "check": [
+      "store gate D2"
+     ],
+     "evidence": [],
+     "fix": [
+      "Remove Apple product names from the name, subtitle and keywords; keep them only where describing compatibility in the description is allowed"
+     ]
+    }
+   ],
+   "unknown_sections": [],
+   "apple_asked": [],
+   "cards": [
+    "[5.1.1(i)] Ask for each permission only when the person uses the feature that needs it, with a plain purpose string",
+    "[5.1.1(i)] Before any personal data leaves the phone, say what is sent and to whom, and ask (Allow / Not now)",
+    "[5.1.1(i)] Add in-app account deletion if there are accounts",
+    "[5.1.1(i)] Make the privacy policy match the app",
+    "[5.1.2(i)] Name the service that receives the data, say what is sent, and ask before the first send",
+    "[5.1.2(i)] Make the App Privacy answers match every SDK",
+    "[5.2.5] Remove Apple product names from the name, subtitle and keywords; keep them only where describing compatibility in the description is allowed"
+   ],
+   "reply_draft": "Thank you. Before any personal data leaves the device, the app now shows what will be sent and to whom, and asks for permission first. The privacy policy says the same: Added an Allow / Not now consent screen before the first message is sent.\n\nA recording of this on a physical device: [link the real-device recording]\n\nThank you. The app now names the service that receives the data, says what is sent, and asks before the first send. The App Privacy answers match: Added an Allow / Not now consent screen before the first message is sent.\n\nThank you. We've removed Apple product names from the app's name, subtitle and keywords: Added an Allow / Not now consent screen before the first message is sent.",
+   "reply_ready": false,
+   "reply_missing": [
+    "the recording link"
+   ]
+  }
+ }
+}
