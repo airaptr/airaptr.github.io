@@ -299,6 +299,19 @@ test("concurrent requests: each preview quotes its own origin", async () => {
   } finally { globalThis.fetch = real; }
 });
 
+test("a factory store/listing.json as-is (plist paths, notes file, extra keys) is accepted; paths are NOT_CHECKED", async () => {
+  const factory = { _about: "x", info_plist: "App/Info.plist", privacy_manifest: "App/PrivacyInfo.xcprivacy", screenshots_dir: "store/screenshots", review_notes_file: "store/REVIEW-NOTES.md",
+    supports_tablet: false, in_app_purchases: false, demo_mode: "Home > Try it", demo_tour: "Home > Tour", age_rating_answers: { a: 1 }, human: { physical_device_tested: "build 3" }, listing: CLEAN.listing };
+  const parsed = parseListing(JSON.stringify(factory));
+  assert.ok(parsed.input, parsed.error);
+  const { rows } = await runChecks(parsed.input, { fetcher: offline });
+  const by = Object.fromEntries(rows.map((r) => [r.code, r]));
+  assert.equal(by.E1.status, "NOT_CHECKED");
+  assert.match(by.E1.found, /file path \(App\/Info\.plist\)/);
+  assert.equal(by.E2.status, "NOT_CHECKED");
+  assert.match(by.E2.found, /file path/);
+});
+
 // ---------- the free preview ----------
 test("preview is free: 200, no payment asked, statuses only (no found, no fix), price of the full version, receipt", async () => {
   calls.verify = calls.settle = 0;

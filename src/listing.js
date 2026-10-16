@@ -245,6 +245,8 @@ export function parseListing(raw) {
     if (cfg[k] !== undefined && cfg[k] !== null && typeof cfg[k] !== "string") return { status: 400, error: `${k} must be a string.` };
   }
   for (const k of ["info_plist", "privacy_manifest", "human", "requires"]) {
+    // A factory store/listing.json names the plist files by path; that is accepted and reported as NOT_CHECKED.
+    if ((k === "info_plist" || k === "privacy_manifest") && typeof cfg[k] === "string") continue;
     if (cfg[k] !== undefined && cfg[k] !== null && (typeof cfg[k] !== "object" || Array.isArray(cfg[k]))) return { status: 400, error: `${k} must be a JSON object.` };
   }
   if (cfg.requires) for (const k of ["what", "get_it_url"]) {
@@ -383,8 +385,9 @@ export async function runChecks(cfg, { fetcher: rawFetcher = safeFetch } = {}) {
   const notesSent = typeof cfg.review_notes === "string";
   const notes = notesSent ? cfg.review_notes : "";
   if (!info) {
+    const why = typeof cfg.info_plist === "string" ? `info_plist was a file path (${cfg.info_plist}), not its contents` : "info_plist not sent";
     for (const [c, t] of [["E1", "Export compliance answered in the build"], ["E3", "Every permission prompt says what is used and where it goes (5.1.1(ii))"], ["E4", "No unexplained App Transport Security exception"]]) {
-      add("NOT_CHECKED", c, t, "info_plist not sent", "Send info_plist (the Info.plist keys as JSON) to check this.");
+      add("NOT_CHECKED", c, t, why, "Send info_plist (the Info.plist keys as JSON) to check this.");
     }
   } else {
     chk(info.ITSAppUsesNonExemptEncryption === false, "E1", "Export compliance answered in the build (ITSAppUsesNonExemptEncryption = NO)", "missing or not NO",
@@ -399,7 +402,8 @@ export async function runChecks(cfg, { fetcher: rawFetcher = safeFetch } = {}) {
         "no 'App Transport Security' paragraph", "Narrow the exception to the domains that need it, or add an 'App Transport Security' paragraph to the review notes saying why.");
     } else add("PASS", "E4", "No blanket App Transport Security exception");
   }
-  if (cfg.privacy_manifest === undefined) add("NOT_CHECKED", "E2", "Privacy manifest: tracking off, every required-reason API has a reason", "privacy_manifest not sent", "Send privacy_manifest (PrivacyInfo.xcprivacy as JSON) to check this.");
+  if (cfg.privacy_manifest === undefined || typeof cfg.privacy_manifest === "string") add("NOT_CHECKED", "E2", "Privacy manifest: tracking off, every required-reason API has a reason",
+    typeof cfg.privacy_manifest === "string" ? `privacy_manifest was a file path (${cfg.privacy_manifest}), not its contents` : "privacy_manifest not sent", "Send privacy_manifest (PrivacyInfo.xcprivacy as JSON) to check this.");
   else if (!cfg.privacy_manifest) add("FAIL", "E2", "Privacy manifest present", "no privacy manifest", "Add PrivacyInfo.xcprivacy to the app target; uploads without required-reason declarations get ITMS-91053.");
   else {
     const pm = cfg.privacy_manifest;
