@@ -1,0 +1,28 @@
+LinkedIn company page for Raptr (fill these in on the "Create a Company Page" form)
+
+Name:            Raptr
+LinkedIn URL:    linkedin.com/company/airaptr
+Website:         https://airaptr.com
+Industry:        Software Development
+Organization size: 0-1 employees
+Organization type: Privately held
+Logo:            logo-300.png (300 x 300)
+Tagline (120 max):
+  AI agents anyone can use. Describe a task in the assistant you already use; Raptr builds the agent and runs it.
+
+Cover image (after the page exists): banner-1128x191.png
+
+About (Overview):
+  Raptr makes AI agents anyone can use. Describe a task in the assistant you already use, and Raptr builds the agent,
+  checks it, and runs it on your own data. Nothing to install.
+
+  Products:
+  - Pickbox: AI questions arrive as a one-click pick list on your screen, with the recommended answer already
+    selected. Free and open source; Pro coming. airaptr.github.io/pickbox
+  - Keeper: the house that runs itself. Watches your cloud and home server, stops paying for what nobody uses, and
+    archives before it deletes.
+  - Raptr Agent Builder, Raptr Agent Finder, Raptr Names, Raptr Domains.
+
+  Raptr is made by Wildhaven Homes LLC.
+
+Specialties: AI agents, developer tools, automation, Claude Code, cloud cost, home servers
