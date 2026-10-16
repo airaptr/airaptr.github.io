@@ -1038,14 +1038,18 @@ export default {
       return handlePaid(request, env, produce, (e) => console.log(JSON.stringify({ evt: "paid_call", ...e })), CORS);
     }
     if (url.pathname === "/want") {
-      // A person asking for card checkout. The log line carries no email, only whether one was left.
+      // A person asking for card checkout. Size is checked before the body is parsed, the caller address is
+      // throttled, and the log line carries no caller text: the product, an allowlisted source, and a yes/no.
       if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"product": "will-it-pass" | "rejection-rescue", "email": "optional"} here.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
-      const { parseWant, recordWant } = await import("./wants.js");
+      const { parseWant, recordWant, throttled, MAX_BODY } = await import("./wants.js");
+      if (Number(request.headers.get("content-length") || 0) > MAX_BODY) return json({ error: `Body too large (max ${MAX_BODY} bytes).` }, 413);
+      const ip = (request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || request.headers.get("x-client-ip") || "unknown";
+      if (throttled(ip)) return json({ error: "That's enough for now; try again in an hour." }, 429);
       const parsed = parseWant(await request.text());
       if (parsed.error) return json({ error: parsed.error }, parsed.status);
       const r = await recordWant(env, parsed.input);
-      console.log(JSON.stringify({ evt: "paid_call", route: "/want", outcome: "want", product: parsed.input.product, email_left: Boolean(parsed.input.email), source: parsed.input.source }));
-      return json(r);
+      console.log(JSON.stringify({ evt: "paid_call", route: "/want", outcome: r.recorded ? "want" : "want_unsaved", product: parsed.input.product, email_left: r.recorded && Boolean(parsed.input.email), source: parsed.input.source }));
+      return json(r, r.recorded ? 200 : 503);
     }
     if (url.pathname === "/wants") {
       const key = env.LEDGER_ADMIN_KEY || globalThis.process?.env?.LEDGER_ADMIN_KEY;
