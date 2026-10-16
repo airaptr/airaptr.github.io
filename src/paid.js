@@ -244,10 +244,10 @@ export async function handlePaid(request, env, produce, log = () => {}, cors = {
   }
   const settled = await http.processSettlement(result.paymentPayload, result.paymentRequirements, result.declaredExtensions);
   if (!settled.success) {
-    log({ route: url.pathname, outcome: "settle_failed" });
+    log({ route: url.pathname, outcome: "settle_failed", reason: settled.errorReason });
     return new Response(JSON.stringify({ error: "Payment could not be settled.", reason: settled.errorReason }), { status: 402, headers: { "Content-Type": "application/json", ...settled.headers, ...cors } });
   }
-  log({ route: url.pathname, outcome: "paid", network: settled.network });
+  log({ route: url.pathname, outcome: "paid", network: settled.network, amount: result.paymentRequirements.amount, tx: settled.transaction });
   // Every settled payment becomes a receipt in the books. A ledger failure never takes back the customer's result.
   try {
     // The ledger ships privately (estate repo); public builds simply skip it.
