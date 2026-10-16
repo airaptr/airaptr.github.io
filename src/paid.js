@@ -7,6 +7,7 @@
 //   X402_FACILITATOR  facilitator URL, default https://x402.org/facilitator (testnet)
 //   X402_PRICE        price per call, default $0.001
 //   X402_PRICE_RESCUE price of the full Rejection Rescue, default $0.50
+//   X402_PRICE_LISTING price of the full "Will it pass?" listing check, default $0.50
 
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { x402HTTPResourceServer } from "@x402/core/http";
@@ -17,9 +18,9 @@ import { paidConfig } from "./paycfg.js";
 
 export { paidConfig };
 
-export const PAID_ROUTES = ["/x402/world", "/x402/domains/register", "/x402/rescue"];
-const SERVICE = { "/x402/world": "dogg-world-check", "/x402/domains/register": "raptr-domains", "/x402/rescue": "rejection-rescue" };
-const METHOD = { "/x402/world": "GET", "/x402/domains/register": "POST", "/x402/rescue": "POST" };
+export const PAID_ROUTES = ["/x402/world", "/x402/domains/register", "/x402/rescue", "/x402/listing"];
+const SERVICE = { "/x402/world": "dogg-world-check", "/x402/domains/register": "raptr-domains", "/x402/rescue": "rejection-rescue", "/x402/listing": "will-it-pass" };
+const METHOD = { "/x402/world": "GET", "/x402/domains/register": "POST", "/x402/rescue": "POST", "/x402/listing": "POST" };
 
 let cached = null;
 
@@ -32,6 +33,7 @@ const str = { type: "string" };
 const strs = { type: "array", items: str };
 
 export const DISCOVERY_TEXT = {
+  "/x402/listing": "Will it pass?: send an App Store listing (name, subtitle, keywords, description, copyright, privacy and support URLs; optionally screenshots, review notes, Info.plist) before submitting; get every machine-checkable rejection reason found, with the guideline section and the exact fix, plus trimmed fields and cleaned keywords. Refused before payment if nothing fails. Charged only when the output is delivered.",
   "/x402/rescue": "Rejection Rescue: send the text of an Apple App Review rejection; get back, for each cited guideline the playbook covers, what it means, likely causes, checks and a fix list, plus a reply draft to App Review that answers each of Apple's questions. Text that cites no covered guideline is refused before payment. Charged only when the output is delivered.",
   "/x402/world": "DOGG World Check: a fresh snapshot of public world numbers (Bitcoin price and block height, crypto market, USD exchange rates, earthquakes in the past hour, space weather, Space Station position) with the snapshot's tick, time and SHA-256 fingerprint, checkable against the public feed.",
 };
@@ -75,6 +77,44 @@ async function rescueDiscovery() {
           sha256_of: { type: "string" },
         },
         required: ["product", "sections", "items", "cards", "reply_draft", "reply_ready", "sha256"],
+      },
+    },
+  });
+}
+
+async function listingDiscovery() {
+  const { check } = await import("./listing.js");
+  const { withReceipt } = await import("./rescue.js");
+  const { SAMPLE_LISTING } = await import("./store.js");
+  const row = { type: "object", properties: { code: str, status: { type: "string", enum: ["PASS", "FAIL", "WARN", "NOT_CHECKED"] }, check: str, section: str, found: str, fix: str } };
+  return declareDiscoveryExtension({
+    bodyType: "json",
+    input: SAMPLE_LISTING,
+    inputSchema: {
+      properties: {
+        listing: { type: "object", description: "name, subtitle, promotional_text, keywords, description, copyright, privacy_policy_url, support_url, marketing_url (strings)." },
+        seller: { type: "string", description: "Optional: legal name of the seller, to check the copyright line." },
+        screenshots: { type: "array", description: "Optional: [{family: iphone-6.9|iphone-6.5|ipad-13, url} or {family, width, height}]." },
+        review_notes: { type: "string", description: "Optional: the App Review notes." },
+        info_plist: { type: "object", description: "Optional: Info.plist keys as JSON." },
+      },
+      required: ["listing"],
+    },
+    output: {
+      // A real output for the sample input above.
+      example: await withReceipt(await check(SAMPLE_LISTING)),
+      schema: {
+        type: "object",
+        properties: {
+          product: { type: "string", const: "will-it-pass" },
+          summary: { type: "object", description: "Counts of PASS, FAIL, WARN, NOT_CHECKED and the verdict." },
+          checks: { type: "array", items: row, description: "Every check, in order, with what was found and the fix." },
+          suggestions: { type: "object", description: "Field values that fit Apple's limits: name, subtitle, description, keywords." },
+          people_must_confirm: { type: "array", description: "What only a person can confirm, with evidence if sent." },
+          sha256: { type: "string", description: "SHA-256 of this object without sha256 and sha256_of, as canonical JSON." },
+          sha256_of: str,
+        },
+        required: ["product", "summary", "checks", "sha256"],
       },
     },
   });
@@ -144,6 +184,14 @@ async function server(cfg, env = {}) {
       serviceName: "airaptr Rejection Rescue",
       tags: ["app-store", "app-review", "ios", "rejection"],
       extensions: await rescueDiscovery(),
+    },
+    "POST /x402/listing": {
+      accepts: { scheme: "exact", network: cfg.network, payTo: cfg.payTo, price: cfg.priceListing },
+      description: DISCOVERY_TEXT["/x402/listing"],
+      mimeType: "application/json",
+      serviceName: "airaptr Will it pass?",
+      tags: ["app-store", "app-review", "ios", "listing", "pre-submission"],
+      extensions: await listingDiscovery(),
     },
   });
   await http.initialize();

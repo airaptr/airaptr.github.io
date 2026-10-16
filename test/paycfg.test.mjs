@@ -22,5 +22,5 @@ test("cdp is false unless both id and secret are set", () => {
 test("store.json never shows the secret", async () => {
   const { storeCatalog } = await import("../src/store.js");
   const cfg = paidConfig({ X402_PAY_TO: "0x" + "1".repeat(40), X402_NETWORK: "eip155:8453", CDP_API_KEY_ID: "id-1", CDP_API_KEY_SECRET: SECRET });
-  assert.ok(!JSON.stringify(storeCatalog("https://api.airaptr.com", cfg)).includes(SECRET));
+  assert.ok(!JSON.stringify(await storeCatalog("https://api.airaptr.com", cfg)).includes(SECRET));
 });

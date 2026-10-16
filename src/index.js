@@ -272,6 +272,36 @@ const TOOLS = [
     annotations: READ_ONLY,
   },
   {
+    name: "will_it_pass_preview",
+    title: "Check an App Store listing before submitting",
+    description:
+      "Use before submitting an app to the App Store, when the user has the listing (name, subtitle, keywords, description, copyright, " +
+      "privacy and support URLs; optionally screenshots, review notes, Info.plist keys). Free. Runs the checks a machine can run against the " +
+      "reasons Apple rejects listings (Apple product names, other companies' names, length limits, placeholders, screenshot sizes, public " +
+      "privacy and support pages...) and says PASS, FAIL, WARN or NOT_CHECKED per check, plus what only a person can confirm. " +
+      "What was found and the fix for each failure is a separate paid HTTP call; the result says its price and route.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        listing: {
+          type: "object",
+          description: "The App Store listing text and URLs",
+          properties: Object.fromEntries(["name", "subtitle", "promotional_text", "keywords", "description", "copyright", "privacy_policy_url", "support_url", "marketing_url"].map((k) => [k, { type: "string" }])),
+        },
+        seller: { type: "string", description: "Legal name of the seller, to check the copyright line" },
+        screenshots: { type: "array", maxItems: 40, items: { type: "object", properties: { family: { type: "string", enum: ["iphone-6.9", "iphone-6.5", "ipad-13"] }, url: { type: "string" }, width: { type: "integer" }, height: { type: "integer" } }, required: ["family"] } },
+        supports_tablet: { type: "boolean" },
+        in_app_purchases: { type: "boolean" },
+        review_notes: { type: "string", description: "The App Review Information notes" },
+        info_plist: { type: "object", description: "Info.plist keys as JSON (optional)" },
+        privacy_manifest: { type: "object", description: "PrivacyInfo.xcprivacy as JSON (optional)" },
+        demo_mode: { type: "string", description: "How a reviewer gets in with nothing set up" },
+      },
+      required: ["listing"],
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+  },
+  {
     name: "request_service",
     title: "Ask us to build something",
     description:
@@ -311,6 +341,13 @@ const PROFILES = {
     instructions:
       "Help people name a business, product or project and make sure they can actually own the name: brainstorm candidates that fit what they " +
       "describe, check them with check_names, explain the trade-offs in plain words, and keep iterating until they have a name with a free domain.",
+  },
+  appstore: {
+    server: { name: "app-store-review", version: "1.0.0" },
+    tools: ["will_it_pass_preview", "rejection_rescue_preview", "request_service"],
+    instructions:
+      "Help people and agents get an app through Apple's App Review: before submitting, will_it_pass_preview checks the listing; " +
+      "after a rejection, rejection_rescue_preview explains Apple's message. Both are free; the full fixes are paid HTTP calls (see /store.json).",
   },
   domains: {
     server: { name: "domain-check", version: "1.0.0" },
@@ -629,7 +666,7 @@ async function fingerprintText({ text, expected }) {
 }
 
 // Rejection Rescue preview (free): the MCP tool, the A2A skill and POST /rescue/preview all answer with this.
-async function rescuePreview(text) {
+async function rescuePreview(text, ctx = { origin: activeOrigin, env: activeEnv }) {
   const { preview, withReceipt, MAX_INPUT_BYTES } = await import("./rescue.js");
   const { rescueOffer } = await import("./store.js");
   const { paidConfig } = await import("./paycfg.js");
@@ -637,8 +674,8 @@ async function rescuePreview(text) {
   if (!t.trim()) return { text: "Paste Apple's rejection message (the text that cites guidelines such as \"Guideline 2.1\").", structured: { error: "empty input" }, isError: true };
   const size = new TextEncoder().encode(t).length;
   if (size > MAX_INPUT_BYTES) return { text: `That is ${size} bytes; the limit is ${MAX_INPUT_BYTES} (20 KB). Send only Apple's rejection message.`, structured: { error: "input too large" }, isError: true };
-  const cfg = paidConfig(activeEnv);
-  const p = await withReceipt(preview(t, rescueOffer(activeOrigin, cfg)));
+  const cfg = paidConfig(ctx.env);
+  const p = await withReceipt(preview(t, rescueOffer(ctx.origin, cfg)));
   const lines = p.recognized.map((r) => `${r.section} ${r.title}: ${r.means}`);
   let out = p.sections.length ? `Apple cited: ${p.sections.join(", ")}\n\n${lines.join("\n")}` : "No guideline numbers found in this text (Apple writes them as \"Guideline 5.1.1(i)\").";
   if (p.unknown_sections.length) out += `\n\nNot in the playbook, so not explained (read Apple's text for these): ${p.unknown_sections.join(", ")}`;
@@ -649,10 +686,29 @@ async function rescuePreview(text) {
   return { text: out, structured: p };
 }
 
+// "Will it pass?" preview (free): the MCP tool and POST /listing/preview answer with this.
+async function listingPreview(cfg, ctx = { origin: activeOrigin, env: activeEnv }) {
+  // ctx is captured per request before any await: the module globals above are shared by concurrent requests.
+  const { check, toPreview } = await import("./listing.js");
+  const { withReceipt } = await import("./rescue.js");
+  const { listingOffer } = await import("./store.js");
+  const { paidConfig } = await import("./paycfg.js");
+  const offer = listingOffer(ctx.origin, paidConfig(ctx.env));
+  const p = await withReceipt(toPreview(await check(cfg), offer));
+  const lines = p.checks.filter((c) => c.status !== "PASS").map((c) => `${c.status} ${c.code} ${c.check}`);
+  let out = `${p.summary.verdict}. ${p.summary.pass} passed, ${p.summary.fail} failed, ${p.summary.warn} warnings, ${p.summary.not_checked} not checked.`;
+  if (lines.length) out += "\n\n" + lines.join("\n");
+  const open = p.people_must_confirm.filter((h) => !h.confirmed).map((h) => `- ${h.item}`);
+  if (open.length) out += "\n\nOnly a person can confirm:\n" + open.join("\n");
+  if (p.full_version.available) out += `\n\nWhat was found and the fix for each: ${p.full_version.route}, ${p.full_version.price} USDC on ${p.full_version.network} over x402.`;
+  out += `\n\n${p.summary.note}`;
+  return { text: out, structured: p };
+}
+
 let currentListing = "";
 let activeEnv = {};
 let activeOrigin = "https://airaptr-api.azurewebsites.net";
-async function callTool(name, args) {
+async function callTool(name, args, ctx) {
   switch (name) {
     case "get_agent_template": return getTemplate();
     case "check_agent": {
@@ -676,7 +732,13 @@ async function callTool(name, args) {
     case "content_seeds": return (await import("./kit.js")).contentSeeds(args);
     case "setup_checklist": return (await import("./kit.js")).setupChecklist(args);
     case "fingerprint_text": return fingerprintText(args);
-    case "rejection_rescue_preview": return rescuePreview(args.text);
+    case "rejection_rescue_preview": return rescuePreview(args.text, ctx);
+    case "will_it_pass_preview": {
+      const { parseListing } = await import("./listing.js");
+      const parsed = parseListing(JSON.stringify(args ?? {}));
+      if (parsed.error) return { text: parsed.error, structured: { error: parsed.error }, isError: true };
+      return listingPreview(parsed.input, ctx);
+    }
     case "request_service": return (await import("./signals.js")).recordRequest(activeEnv, { request: args.request, listing: currentListing });
     case "check_names": return (await import("./domains.js")).checkNames(args);
     case "check_domain": return (await import("./domains.js")).checkDomains(args);
@@ -687,7 +749,7 @@ async function callTool(name, args) {
 
 // ---------- MCP JSON-RPC ----------
 
-async function handleRpc(msg, profile = PROFILES.builder) {
+async function handleRpc(msg, profile = PROFILES.builder, ctx) {
   const tools = TOOLS.filter((t) => profile.tools.includes(t.name));
   const { id, method, params = {} } = msg;
   const ok = (result) => ({ jsonrpc: "2.0", id, result });
@@ -711,7 +773,7 @@ async function handleRpc(msg, profile = PROFILES.builder) {
       if (!tool) return err(-32602, `Unknown tool: ${params.name}`);
       try {
         currentListing = profile.server.name;
-        const r = await callTool(params.name, params.arguments || {});
+        const r = await callTool(params.name, params.arguments || {}, ctx);
         usage(profile, params.name, !r.isError);
         return ok({ content: [{ type: "text", text: r.text }], structuredContent: r.structured, isError: !!r.isError });
       } catch (e) {
@@ -738,6 +800,7 @@ function llmsTxt(origin) {
 - [Agent Finder](${origin}/finder/mcp): find_agents, get_agent_code, use_agent_here, how_to_run_agent
 - [World Check](${origin}/world/mcp): world_now, fingerprint_text
 - [Domain Check](${origin}/domains/mcp): check_domain, register_domain
+- [App Store Review](${origin}/appstore/mcp): will_it_pass_preview, rejection_rescue_preview
 
 ## Pay per call (x402 v2, USDC)
 
@@ -749,8 +812,10 @@ function llmsTxt(origin) {
 - [Catalog](${origin}/store.json): every product with its free part, paid part, price, network, exact calls, a sample input and output, and terms. Charged only when the paid output is delivered.
 - Rejection Rescue, free preview: POST ${origin}/rescue/preview with {"text": "<Apple's rejection message>"}, or the MCP tool rejection_rescue_preview on ${origin}/mcp. Returns the guideline sections it recognizes and what Apple means by each.
 - Rejection Rescue, full (paid): POST ${origin}/x402/rescue with {"text": "...", "changes": "optional", "recording_url": "optional"}: likely causes, a fix list and a reply draft to App Review. Price and network are in the 402 response and in store.json. Input up to 20 KB; empty, invalid or unrecognized input is refused before payment.
-- Every Rejection Rescue response carries sha256, a receipt of its own body (canonical JSON).
-- Coming soon: rapple-sim (free iOS Simulator MCP server), and a "Will it pass?" App Store listing check.
+- "Will it pass?" listing check, free: POST ${origin}/listing/preview with {"listing": {"name", "subtitle", "keywords", "description", "copyright", "privacy_policy_url", "support_url"}, "screenshots": [...], "review_notes": "..."} (a store/listing.json works as-is), or the MCP tool will_it_pass_preview on ${origin}/appstore/mcp. PASS, FAIL, WARN or NOT_CHECKED per check, before you submit.
+- "Will it pass?", full (paid): POST ${origin}/x402/listing with the same body: what was found and the fix for each failure, plus trimmed fields and cleaned keywords. Refused before payment when there is nothing to fix.
+- Every Rejection Rescue and "Will it pass?" response carries sha256, a receipt of its own body (canonical JSON).
+- Coming soon: rapple-sim (free iOS Simulator MCP server).
 
 ## A2A
 
@@ -824,7 +889,7 @@ export function pickSkill(text, meta = {}) {
   return "find_agents";
 }
 
-async function handleA2A(msg) {
+async function handleA2A(msg, ctx) {
   const { id, method, params = {} } = msg || {};
   const err = (code, message) => ({ jsonrpc: "2.0", id: id ?? null, error: { code, message } });
   const v1 = method === "SendMessage";
@@ -835,7 +900,7 @@ async function handleA2A(msg) {
   let r;
   if (skill === "world_now") r = await worldNow();
   else if (skill === "agent_template") r = getTemplate();
-  else if (skill === "rejection_rescue_preview") r = await rescuePreview(text);
+  else if (skill === "rejection_rescue_preview") r = await rescuePreview(text, ctx);
   else r = await findAgents({ query: text, limit: 5 });
   usage({ server: { name: "agent-a2a" } }, skill, !r.isError);
   const contextId = m.contextId || crypto.randomUUID();
@@ -886,6 +951,7 @@ export default {
     activeEnv = env;
     const url = new URL(request.url);
     activeOrigin = url.origin;
+    const ctx = { origin: url.origin, env }; // per request; pass this, never read the globals after an await
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     // OpenAI domain verification: serve exactly the token the plugin portal issues.
     if (url.pathname === "/.well-known/openai-apps-challenge") {
@@ -897,7 +963,7 @@ export default {
     if (url.pathname === "/store.json") {
       const { storeCatalog } = await import("./store.js");
       const { paidConfig } = await import("./paycfg.js");
-      return json(storeCatalog(url.origin, paidConfig(env)));
+      return json(await storeCatalog(url.origin, paidConfig(env)));
     }
     if (url.pathname === "/health/payments") {
       const { paymentsReady } = await import("./paid.js");
@@ -909,14 +975,39 @@ export default {
       const { parseInput, withReceipt } = await import("./rescue.js");
       const parsed = parseInput(await request.text(), request.headers.get("content-type") || "");
       if (parsed.error) return json(await withReceipt({ error: parsed.error }), parsed.status);
-      const r = await rescuePreview(parsed.input.text);
+      const r = await rescuePreview(parsed.input.text, ctx);
       return json(r.structured, r.isError ? 400 : 200);
+    }
+    if (url.pathname === "/listing/preview") {
+      if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"listing": {...}} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
+      const { parseListing } = await import("./listing.js");
+      const { withReceipt } = await import("./rescue.js");
+      const parsed = parseListing(await request.text());
+      if (parsed.error) return json(await withReceipt({ error: parsed.error }), parsed.status);
+      return json((await listingPreview(parsed.input, ctx)).structured);
     }
     if (url.pathname.startsWith(PAID_PREFIX)) {
       const { handlePaid, PAID_ROUTES } = await import("./paid.js");
       if (!PAID_ROUTES.includes(url.pathname)) return json({ error: "not found" }, 404);
       let produce;
-      if (url.pathname === "/x402/rescue") {
+      if (url.pathname === "/x402/listing") {
+        // Same rule as Rescue: everything that can be refused is refused before any payment is asked for or taken.
+        if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"listing": {...}} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
+        const { parseListing, check, hasFixes } = await import("./listing.js");
+        const { withReceipt } = await import("./rescue.js");
+        const parsed = parseListing(await request.text());
+        const paying = Boolean(request.headers.get("payment-signature") || request.headers.get("x-payment"));
+        if (parsed.empty && !paying) produce = async () => { throw new Error("empty input is never produced"); };
+        else if (parsed.error) return json(await withReceipt({ error: parsed.error, charged: false }), parsed.status);
+        else {
+          // The checks (and their page fetches) run once; the paid answer is this same result.
+          const full = await check(parsed.input);
+          if (!hasFixes(full)) {
+            return json(await withReceipt({ error: "Nothing to fix (no failures, and no warnings beyond our optional tour advice). Not charged.", charged: false, summary: full.summary }), 422);
+          }
+          produce = async () => withReceipt(full);
+        }
+      } else if (url.pathname === "/x402/rescue") {
         // Everything that can be refused is refused here, before any payment is asked for or taken.
         if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"text": "<Apple\'s rejection message>"} here. See /store.json.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
         const { parseInput, withReceipt, rescue, preview } = await import("./rescue.js");
@@ -983,12 +1074,12 @@ export default {
       if (request.method !== "POST") return json(agentCard(url.origin));
       let msg;
       try { msg = await request.json(); } catch { return json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400); }
-      return json(await handleA2A(msg));
+      return json(await handleA2A(msg, ctx));
     }
     if (url.pathname === "/" || url.pathname === "/health") {
       return json({ ok: true, listings: Object.fromEntries(Object.entries(PROFILES).map(([k, p]) => [p.server.name, { version: p.server.version, mcp: `${url.origin}${k === "builder" ? "" : "/" + k}/mcp` }])), site: SITE });
     }
-    const route = { "/mcp": "builder", "/finder/mcp": "finder", "/world/mcp": "world", "/domains/mcp": "domains", "/names/mcp": "names", "/kit/mcp": "kit" }[url.pathname];
+    const route = { "/mcp": "builder", "/finder/mcp": "finder", "/world/mcp": "world", "/domains/mcp": "domains", "/names/mcp": "names", "/kit/mcp": "kit", "/appstore/mcp": "appstore" }[url.pathname];
     if (!route) return json({ error: "not found" }, 404);
     const profile = PROFILES[route];
     if (request.method === "GET") return new Response("SSE stream not offered; POST JSON-RPC to /mcp.", { status: 405, headers: { Allow: "POST", ...CORS } });
@@ -998,10 +1089,10 @@ export default {
     let body;
     try { body = await request.json(); } catch { return json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400); }
     if (Array.isArray(body)) {
-      const out = (await Promise.all(body.map((m) => handleRpc(m, profile)))).filter(Boolean);
+      const out = (await Promise.all(body.map((m) => handleRpc(m, profile, ctx)))).filter(Boolean);
       return out.length ? json(out) : new Response(null, { status: 202, headers: CORS });
     }
-    const out = await handleRpc(body, profile);
+    const out = await handleRpc(body, profile, ctx);
     return out ? json(out) : new Response(null, { status: 202, headers: CORS });
   },
 };
