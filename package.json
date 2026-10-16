@@ -2,6 +2,14 @@
   "name": "airaptr",
   "private": true,
   "type": "module",
+  "scripts": {
+    "local": "node local/serve.mjs",
+    "local:testnet": "node local/serve.mjs --testnet",
+    "buy": "node local/buy.mjs",
+    "buy:testnet": "node local/buy.mjs --testnet",
+    "test": "node --test test/*.test.mjs",
+    "smoke:live": "node test/live_smoke.mjs"
+  },
   "dependencies": {
     "@azure/data-tables": "^13.3.0",
     "@coinbase/x402": "^2.1.0",
