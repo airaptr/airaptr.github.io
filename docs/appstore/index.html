@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Store check by Raptr</title>
+<meta name="description" content="Paste your App Store listing or Apple's rejection message. Free, in your browser: what Apple means and what a machine can check before you submit.">
+<link rel="icon" href="../icon-64.png">
+<style>
+:root{--bg:#FAFAF9;--ink:#18181B;--muted:#55555c;--line:#e4e4e2;--panel:#fff;--accent:#1F6F4A;--accent-ink:#fff;--sel:#d7ecdf;--warn:#8a5a00;--bad:#9a2b2b;--good:#1F6F4A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111312;--ink:#ECECEA;--muted:#a6a8a4;--line:#262a28;--panel:#191c1a;--accent:#5CC492;--accent-ink:#0b1a12;--sel:#1f3a2b;--warn:#e0b25a;--bad:#f08a8a;--good:#5CC492}}
+:root[data-theme="dark"]{--bg:#111312;--ink:#ECECEA;--muted:#a6a8a4;--line:#262a28;--panel:#191c1a;--accent:#5CC492;--accent-ink:#0b1a12;--sel:#1f3a2b;--warn:#e0b25a;--bad:#f08a8a;--good:#5CC492}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px 16px 64px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--muted)}.top a{color:var(--ink);text-decoration:none;font-weight:700}
+h1{font-size:34px;line-height:1.1;margin:28px 0 10px;letter-spacing:-.02em}
+.lead{font-size:19px;color:var(--muted);margin:0 0 22px}
+.tabs{display:flex;gap:8px;margin:0 0 16px}.tabs button{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.tabs button[aria-selected=true]{border-color:var(--accent);background:var(--sel)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+label{display:block;font-weight:600;margin:12px 0 4px}label:first-child{margin-top:0}
+input,textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+.cta{display:inline-block;margin-top:14px;background:var(--accent);color:var(--accent-ink);padding:13px 24px;border-radius:999px;font:inherit;font-weight:600;border:0;cursor:pointer}
+.cta[disabled]{opacity:.6;cursor:default}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.small{font-size:14px;color:var(--muted)}
+#out{margin-top:18px}
+.verdict{font-size:22px;font-weight:700;margin:0 0 6px}
+.row{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}.row:first-of-type{border-top:0}
+.tag{flex:0 0 64px;font-weight:700}.PASS{color:var(--good)}.WARN{color:var(--warn)}.FAIL{color:var(--bad)}.NOT_CHECKED{color:var(--muted)}
+.sec{padding:10px 0;border-top:1px solid var(--line)}.sec b{display:block}.sec span{color:var(--muted);font-size:15px}
+.next{margin-top:22px;padding:18px;border-radius:14px;background:var(--sel)}.next h2{margin:0 0 6px;font-size:20px}.next p{margin:0 0 10px}
+details{margin-top:28px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}summary{cursor:pointer;font-weight:600}
+code{font-family:ui-monospace,Menlo,monospace;font-size:14px;background:var(--bg);padding:2px 6px;border-radius:6px}
+.hide{display:none}
+footer{border-top:1px solid var(--line);margin-top:48px;padding-top:16px;color:var(--muted);font-size:14px}footer a{color:var(--accent);margin-right:14px}
+</style></head>
+<body><main>
+<div class="top"><a href="../">Raptr</a><span>for people shipping iPhone apps</span></div>
+
+<h1>Will Apple pass it?</h1>
+<p class="lead">Paste your listing, or Apple's rejection message. You get a plain answer in your browser, free. Nothing you paste is stored.</p>
+
+<div class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="listing">Check my listing</button>
+  <button role="tab" aria-selected="false" data-tab="rescue">I got rejected</button>
+</div>
+
+<section class="panel" id="listing">
+  <label for="name">App name</label><input id="name" maxlength="60" autocomplete="off">
+  <label for="subtitle">Subtitle</label><input id="subtitle" maxlength="60" autocomplete="off">
+  <label for="keywords">Keywords <span class="small">(comma-separated, as in App Store Connect)</span></label><input id="keywords" maxlength="200" autocomplete="off">
+  <label for="description">Description</label><textarea id="description"></textarea>
+  <button class="cta" id="runListing">Check it</button>
+</section>
+
+<section class="panel hide" id="rescue">
+  <label for="text">Apple's message</label>
+  <p class="small" style="margin:0 0 6px">Copy the whole thing from App Store Connect or the email, guideline numbers and all.</p>
+  <textarea id="text" style="min-height:180px"></textarea>
+  <button class="cta" id="runRescue">What does Apple mean?</button>
+</section>
+
+<div id="out" aria-live="polite"></div>
+
+<details><summary>Details</summary>
+  <p class="small">The free check runs against <code>api.airaptr.com</code>, the same service AI agents use. The listing check is the 27 things a machine can test before App Review (lengths, names Apple rejects, keyword waste, privacy and support pages, and so on). The rejection reader recognizes the guideline sections Apple cites and says what each one means. Passing does not mean Apple will approve the app; it means these known reasons for rejection are not in what you sent.</p>
+  <p class="small">The full versions (every fix, and a reply to App Review that answers each of Apple's questions) are $0.50 each for AI agents paying with USDC, see <a href="https://api.airaptr.com/store.json">the catalog</a>. Card checkout for people is not open yet; the button above tells us you want it. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></p>
+</details>
+
+<footer>Made by Wildhaven Homes LLC <a href="https://airaptr.com">airaptr.com</a> <a href="../contact.html">Contact</a></footer>
+</main>
+<script>
+const API = "https://api.airaptr.com";
+const $ = (id) => document.getElementById(id);
+const out = $("out");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let current = "listing";
+let lastInput = null;
+
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
+  current = b.dataset.tab;
+  document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  $("listing").classList.toggle("hide", current !== "listing");
+  $("rescue").classList.toggle("hide", current !== "rescue");
+  out.innerHTML = "";
+}));
+
+async function call(path, body) {
+  const r = await fetch(API + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({ error: "The service answered with something that wasn't JSON." }));
+  if (!r.ok) throw new Error(j.error || `The service answered ${r.status}.`);
+  return j;
+}
+
+function busy(btn, on) { btn.disabled = on; btn.textContent = on ? "Checking…" : btn.dataset.label; }
+$("runListing").dataset.label = "Check it"; $("runRescue").dataset.label = "What does Apple mean?";
+
+$("runListing").addEventListener("click", async () => {
+  const listing = { name: $("name").value, subtitle: $("subtitle").value, keywords: $("keywords").value, description: $("description").value };
+  if (!listing.name.trim() && !listing.description.trim()) { out.innerHTML = `<p class="small">Paste at least the name and the description.</p>`; return; }
+  busy($("runListing"), true);
+  try {
+    const j = await call("/listing/preview", { listing });
+    lastInput = { product: "will-it-pass" };
+    const s = j.summary || {};
+    const checks = (j.checks || []).filter((c) => c.status !== "PASS");
+    out.innerHTML = `<p class="verdict">${esc(s.verdict || "Checked")}</p>
+      <p class="small">${s.pass ?? 0} passed · ${s.warn ?? 0} to look at · ${s.fail ?? 0} failed · ${s.not_checked ?? 0} need the files, not the text</p>
+      <div class="panel">${checks.length ? checks.map((c) => `<div class="row"><span class="tag ${esc(c.status)}">${esc(c.status === "NOT_CHECKED" ? "SKIPPED" : c.status)}</span><span>${esc(c.check)}${c.detail ? ` <span class="small">${esc(c.detail)}</span>` : ""}</span></div>`).join("") : `<div class="row"><span class="tag PASS">PASS</span><span>Everything a machine can check from the text passed.</span></div>`}</div>
+      ${next("will-it-pass", "The full report says how to fix each one, in the words App Store Connect uses, and re-checks until it's clean.")}`;
+    wire();
+  } catch (e) { out.innerHTML = `<p class="small">${esc(e.message)}</p>`; }
+  finally { busy($("runListing"), false); }
+});
+
+$("runRescue").addEventListener("click", async () => {
+  const text = $("text").value;
+  if (text.trim().length < 20) { out.innerHTML = `<p class="small">Paste Apple's whole message first.</p>`; return; }
+  busy($("runRescue"), true);
+  try {
+    const j = await call("/rescue/preview", { text });
+    lastInput = { product: "rejection-rescue" };
+    const rec = j.recognized || [];
+    const unk = j.unknown_sections || [];
+    out.innerHTML = `<p class="verdict">${rec.length ? `Apple cited ${rec.length} guideline${rec.length === 1 ? "" : "s"}` : "No guideline numbers found"}</p>
+      <p class="small">${j.apple_asked_count ? `Apple asked ${j.apple_asked_count} question${j.apple_asked_count === 1 ? "" : "s"} that the reply has to answer one by one.` : "Apple asked no numbered questions."}</p>
+      <div class="panel">${rec.map((r) => `<div class="sec"><b>${esc(r.section)} · ${esc(r.title)}</b><span>${esc(r.means)}</span></div>`).join("")}${unk.map((u) => `<div class="sec"><b>${esc(u)}</b><span>Not in our playbook yet; we don't guess.</span></div>`).join("")}</div>
+      ${next("rejection-rescue", "The full rescue gives the likely cause and the fix for each guideline, and drafts the reply to App Review that answers every question Apple asked.")}`;
+    wire();
+  } catch (e) { out.innerHTML = `<p class="small">${esc(e.message)}</p>`; }
+  finally { busy($("runRescue"), false); }
+});
+
+function next(product, what) {
+  return `<div class="next" id="next">
+    <h2>Want the full version?</h2>
+    <p>${esc(what)}</p>
+    <p class="small">Card checkout isn't open yet: <b>$5 for 10</b> when it is. Tell us you want it and we open it for the first people who ask.</p>
+    <label for="email" class="small">Email, only if you want one message when it opens (optional)</label>
+    <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+    <button class="cta" id="want" data-product="${esc(product)}">I want this</button>
+    <p class="small" id="wantNote"></p>
+  </div>`;
+}
+
+function wire() {
+  const btn = $("want");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      const j = await call("/want", { product: btn.dataset.product, email: $("email").value, source: "people-page" });
+      $("next").innerHTML = `<h2>Thanks</h2><p>${esc(j.message)}</p>`;
+    } catch (e) { $("wantNote").textContent = e.message; btn.disabled = false; }
+  });
+}
+</script>
+</body></html>

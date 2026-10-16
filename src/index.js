@@ -1037,6 +1037,22 @@ export default {
           };
       return handlePaid(request, env, produce, (e) => console.log(JSON.stringify({ evt: "paid_call", ...e })), CORS);
     }
+    if (url.pathname === "/want") {
+      // A person asking for card checkout. The log line carries no email, only whether one was left.
+      if (request.method !== "POST") return new Response(JSON.stringify({ error: 'POST {"product": "will-it-pass" | "rejection-rescue", "email": "optional"} here.' }), { status: 405, headers: { "Content-Type": "application/json", Allow: "POST", ...CORS } });
+      const { parseWant, recordWant } = await import("./wants.js");
+      const parsed = parseWant(await request.text());
+      if (parsed.error) return json({ error: parsed.error }, parsed.status);
+      const r = await recordWant(env, parsed.input);
+      console.log(JSON.stringify({ evt: "paid_call", route: "/want", outcome: "want", product: parsed.input.product, email_left: Boolean(parsed.input.email), source: parsed.input.source }));
+      return json(r);
+    }
+    if (url.pathname === "/wants") {
+      const key = env.LEDGER_ADMIN_KEY || globalThis.process?.env?.LEDGER_ADMIN_KEY;
+      if (!key || request.headers.get("x-admin-key") !== key) return json({ error: "not found" }, 404);
+      const day = url.searchParams.get("day") || new Date().toISOString().slice(0, 10);
+      return json({ day, wants: await (await import("./wants.js")).listWants(env, day) });
+    }
     if (url.pathname === "/signals") {
       const key = env.LEDGER_ADMIN_KEY || globalThis.process?.env?.LEDGER_ADMIN_KEY;
       if (!key || request.headers.get("x-admin-key") !== key) return json({ error: "not found" }, 404);

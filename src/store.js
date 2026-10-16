@@ -62,7 +62,7 @@ export async function storeCatalog(origin, cfg) {
   return {
     store: "Raptr agent store",
     seller: { name: "Wildhaven Homes LLC", site: "https://airaptr.github.io/" },
-    for: "AI agents buying for their owner; people can use the same routes.",
+    for: "AI agents buying for their owner; people can use the same routes, or the page https://airaptr.github.io/appstore/ (free previews now; a $5 card pack of 10 full checks opens once people ask for it there).",
     payments: {
       protocol: "x402 v2 (HTTP 402). No account or API key.",
       paid_routes_on: on,
